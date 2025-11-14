@@ -3,7 +3,7 @@
 This repository is a simple monorepo scaffold with two packages:
 
 - `frontend` — a minimal Vite + React app skeleton
-- `backend` — a minimal Express API
+- `backend` — a minimal Express APIs
 
 Usage
 
