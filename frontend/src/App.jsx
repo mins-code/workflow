@@ -1,29 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
-import Dashboard from './Dashboard';
 import Teams from './pages/Teams';
+import ProjectListView from './pages/ProjectListView'; // Import the renamed component
 import NewProject from './pages/NewProject';
+import ProjectDetailView from './pages/ProjectDetailView'; // Import the new Project Detail View
 import Analytics from './pages/Analytics';
 import AuthForm from './components/AuthForm';
-import CreateTeamPage from './pages/CreateTeamPage'; // Import the new component
+import CreateTeamPage from './pages/CreateTeamPage';
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    // Check if a token exists in localStorage
     const token = localStorage.getItem('token');
     setIsLoggedIn(!!token);
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('token'); // Clear the token
-    setIsLoggedIn(false); // Update the login state
+    localStorage.removeItem('token');
+    setIsLoggedIn(false);
   };
 
   const handleAuthSuccess = () => {
-    setIsLoggedIn(true); // Update the login state on successful authentication
+    setIsLoggedIn(true);
   };
 
   if (!isLoggedIn) {
@@ -40,18 +40,17 @@ const App = () => {
   return (
     <Router>
       <div className="flex">
-        {/* Sidebar */}
         <Sidebar onLogout={handleLogout} />
 
-        {/* Main Content Area */}
         <div className="flex-1 ml-64 p-6 bg-gray-100 min-h-screen">
           <Routes>
-            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/teams" element={<Teams />} />
-            <Route path="/teams/new" element={<CreateTeamPage />} /> {/* Add the new route for creating a team */}
-            <Route path="/projects/new" element={<NewProject />} />
+            <Route path="/teams/new" element={<CreateTeamPage />} />
+            <Route path="/projects" element={<ProjectListView />} /> {/* Project List */}
+            <Route path="/projects/new" element={<NewProject />} /> {/* Project Creation */}
+            <Route path="/projects/:projectId" element={<ProjectDetailView />} /> {/* Project Detail */}
             <Route path="/analytics" element={<Analytics />} />
-            <Route path="*" element={<Navigate to="/dashboard" />} />
+            <Route path="*" element={<Navigate to="/projects" />} /> {/* Default to Project List */}
           </Routes>
         </div>
       </div>

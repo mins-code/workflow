@@ -32,16 +32,6 @@ const Sidebar = ({ onLogout }) => {
           👥 Teams
         </NavLink>
         <NavLink
-          to="/projects/new"
-          className={({ isActive }) =>
-            `block px-4 py-2 rounded-lg font-medium ${
-              isActive ? 'bg-gray-700' : 'hover:bg-gray-800'
-            }`
-          }
-        >
-          ➕ New Project
-        </NavLink>
-        <NavLink
           to="/analytics"
           className={({ isActive }) =>
             `block px-4 py-2 rounded-lg font-medium ${
