@@ -11,15 +11,7 @@ async function main() {
   await prisma.user.deleteMany({});
   await prisma.team.deleteMany({});
 
-  // Step 2: Create a Team
-  const team = await prisma.team.create({
-    data: {
-      name: 'Engineering Alpha',
-      description: 'The core engineering team for the MVP.',
-    },
-  });
-
-  // Step 3: Create Users
+  // Step 2: Create Users
   const alice = await prisma.user.create({
     data: {
       name: 'Alice',
@@ -29,7 +21,6 @@ async function main() {
       availability: 1.0,
       maxHours: 40,
       assignedHours: 0,
-      teamId: team.id,
       password: 'hashed_password_here', // Add hashed password
     },
   });
@@ -43,7 +34,6 @@ async function main() {
       availability: 1.0,
       maxHours: 40,
       assignedHours: 0,
-      teamId: team.id,
       password: 'hashed_password_here', // Add hashed password
     },
   });
@@ -57,22 +47,20 @@ async function main() {
       availability: 1.0,
       maxHours: 20,
       assignedHours: 0,
-      teamId: team.id,
       password: 'hashed_password_here', // Add hashed password
     },
   });
 
-  // Step 4: Create a Project
+  // Step 3: Create a Project
   const project = await prisma.project.create({
     data: {
       title: 'MVP Dashboard',
       goal: 'Build the minimum viable product for the dashboard.',
       deadline: new Date('2025-12-31'),
-      teamId: team.id,
     },
   });
 
-  // Step 5: Create Tasks
+  // Step 4: Create Tasks
   const tasks = [
     {
       title: 'Setup React App',

@@ -8,16 +8,27 @@ const ProjectDetailView = () => {
   const [tasks, setTasks] = useState([]);
   const [error, setError] = useState(null);
 
-  // Fetch project details and tasks
+  // Fetch project details and tasks securely
   const fetchProjectDetails = async () => {
     try {
-      const projectRes = await axios.get(`http://localhost:3000/api/projects/${projectId}`);
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('Unauthorized: No token found');
+      }
+
+      // Fetch project details
+      const projectRes = await axios.get(`http://localhost:3000/api/projects/${projectId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setProject(projectRes.data);
 
-      const tasksRes = await axios.get(`http://localhost:3000/api/projects/${projectId}/tasks`);
+      // Fetch tasks for the project
+      const tasksRes = await axios.get(`http://localhost:3000/api/projects/${projectId}/tasks`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setTasks(tasksRes.data);
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'Failed to fetch project details.');
     }
   };
 
@@ -25,16 +36,28 @@ const ProjectDetailView = () => {
     fetchProjectDetails();
   }, [projectId]);
 
-  // Handle drag-and-drop
+  // Handle drag start
   const handleDragStart = (e, taskId) => {
     e.dataTransfer.setData('taskId', taskId);
   };
 
+  // Handle drag over
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
+
+  // Handle drop
   const handleDrop = async (e, newStatus) => {
     const taskId = e.dataTransfer.getData('taskId');
+    const token = localStorage.getItem('token');
+
     try {
       // Update task status in the backend
-      await axios.put(`http://localhost:3000/api/projects/tasks/${taskId}`, { status: newStatus });
+      await axios.put(
+        `http://localhost:3000/api/projects/tasks/${taskId}`,
+        { status: newStatus },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
       // Update task status in local state
       setTasks((prevTasks) =>
@@ -48,9 +71,8 @@ const ProjectDetailView = () => {
     }
   };
 
-  const handleDragOver = (e) => {
-    e.preventDefault();
-  };
+  // Filter tasks by status
+  const tasksByStatus = (status) => tasks.filter((task) => task.status === status);
 
   if (error) {
     return <div className="p-10 text-red-500 font-bold">❌ Error: {error}</div>;
@@ -59,9 +81,6 @@ const ProjectDetailView = () => {
   if (!project) {
     return <div className="p-10 text-gray-500">Loading project details...</div>;
   }
-
-  // Filter tasks by status
-  const tasksByStatus = (status) => tasks.filter((task) => task.status === status);
 
   return (
     <div className="min-h-screen bg-gray-100 p-8 font-sans">
@@ -87,8 +106,7 @@ const ProjectDetailView = () => {
               onDragStart={(e) => handleDragStart(e, task.id)}
             >
               <h3 className="text-lg font-semibold text-blue-600">{task.title}</h3>
-              <p className="text-sm text-gray-500">{task.description}</p>
-              <p className="text-xs text-gray-400">Estimated Hours: {task.estimatedHours}</p>
+              <p className="text-sm text-gray-500">Status: {task.status}</p>
             </div>
           ))}
         </div>
@@ -108,8 +126,7 @@ const ProjectDetailView = () => {
               onDragStart={(e) => handleDragStart(e, task.id)}
             >
               <h3 className="text-lg font-semibold text-yellow-600">{task.title}</h3>
-              <p className="text-sm text-gray-500">{task.description}</p>
-              <p className="text-xs text-gray-400">Estimated Hours: {task.estimatedHours}</p>
+              <p className="text-sm text-gray-500">Status: {task.status}</p>
             </div>
           ))}
         </div>
@@ -129,8 +146,7 @@ const ProjectDetailView = () => {
               onDragStart={(e) => handleDragStart(e, task.id)}
             >
               <h3 className="text-lg font-semibold text-green-600">{task.title}</h3>
-              <p className="text-sm text-gray-500">{task.description}</p>
-              <p className="text-xs text-gray-400">Estimated Hours: {task.estimatedHours}</p>
+              <p className="text-sm text-gray-500">Status: {task.status}</p>
             </div>
           ))}
         </div>

@@ -43,8 +43,8 @@ model Project {
   deadline    DateTime
   status      String    @default("PLANNED") 
   
-  teamId      String
-  team        Team      @relation(fields: [teamId], references: [id])
+  teamId      String?
+  team        Team?      @relation(fields: [teamId], references: [id])
   tasks       Task[]
 }
 
