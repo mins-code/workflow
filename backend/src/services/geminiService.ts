@@ -31,9 +31,10 @@ const JSON_SCHEMA = {
                     // Note: You can optionally add "description" here if you wish
                 },
             },
+            idealAssigneeName: { type: "string" }, // New field for the ideal assignee's name
         },
         // All top-level fields are required
-        required: ["title", "description", "estimatedHours", "requiredSkills"], 
+        required: ["title", "description", "estimatedHours", "requiredSkills", "idealAssigneeName"], 
     },
 };
 
@@ -50,7 +51,7 @@ const geminiClient = new GoogleGenAI({
  * Generate a task plan for a project using Google Gemini LLM.
  * @param projectId - The ID of the project.
  * @param userInput - Additional user input to guide the task decomposition.
- * @returns A list of tasks with skill requirements.
+ * @returns A list of tasks with skill requirements and ideal assignees.
  */
 export async function generateTaskPlan(projectId: string, userInput: string) {
   try {
@@ -68,15 +69,28 @@ export async function generateTaskPlan(projectId: string, userInput: string) {
 
     // Step 2: Construct the updated prompt
     const prompt = `
-      You are a Project Decomposition Assistant. Your job is to analyze the project goal and user-provided team capabilities, and then generate a list of executable tasks.
+      You are a Project Decomposition Assistant. Your job is to analyze the project goal, user-provided team capabilities, and then generate a list of executable tasks.
       Project: "${projectTitle}".
       Goal: "${projectGoal}".
       User Description of Team Capabilities: "${userInput}".
 
       Instructions:
-      - Analyze the team skills described by the user in the 'User Input' section (e.g., 'expert', 'novice', 'worked a lot') and translate those natural language descriptions directly into the required numerical proficiency levels (0.0 to 1.0) for every skill in the final 'requiredSkills' JSON object.
+      - Analyze the team skills described by the user in the 'User Input' section (e.g., 'Alice is an expert in React, Bob is skilled in Node.js').
       - Infer the required skills for each task based on the project goal and user input.
+      - Select the name of the team member best suited for each task based on the required skills and the team's capabilities.
+      - Place the chosen user's name in the 'idealAssigneeName' field of the task object.
       - Generate the list of tasks inside a **JSON markdown block** (i.e., wrapped in \`\`\`json and \`\`\`).
+
+      The JSON format for each task is as follows:
+      {
+        "title": "Task Title",
+        "description": "Detailed description of the task.",
+        "estimatedHours": 8,
+        "requiredSkills": {
+          "skillName": 0.8
+        },
+        "idealAssigneeName": "Alice"
+      }
     `;
 
     // Step 3: Call the Gemini API without strict schema validation

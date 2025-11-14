@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import apiClient from '../api/apiClient';
 
 const GeminiChatView = () => {
   const [projects, setProjects] = useState([]);
   const [selectedProjectId, setSelectedProjectId] = useState('');
   const [userInput, setUserInput] = useState('');
-  const [chatHistory, setChatHistory] = useState([]);
+  const [chatHistory, setChatHistory] = useState([]); // Chat history state
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -13,10 +13,7 @@ const GeminiChatView = () => {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const token = localStorage.getItem('token');
-        const res = await axios.get('http://localhost:3000/api/projects', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await apiClient.get('/projects');
         setProjects(res.data);
       } catch (err) {
         setError('Failed to fetch projects.');
@@ -26,6 +23,16 @@ const GeminiChatView = () => {
 
     fetchProjects();
   }, []);
+
+  // Utility function to format the task plan JSON into readable text
+  const formatTaskPlan = (tasks) => {
+    return tasks
+      .map(
+        (task) =>
+          `✅ **${task.title}**\n📄 ${task.description}\n⏳ Estimated Hours: ${task.estimatedHours}\n👤 Assigned to: **${task.idealAssigneeName || 'Unassigned'}**`
+      )
+      .join('\n\n');
+  };
 
   // Handle form submission
   const handleSubmit = async (e) => {
@@ -38,18 +45,23 @@ const GeminiChatView = () => {
     setIsLoading(true);
     setError(null);
 
-    try {
-      const token = localStorage.getItem('token');
-      const res = await axios.post(
-        'http://localhost:3000/api/gemini/plan',
-        { projectId: selectedProjectId, userInput },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+    // Add user input to chat history
+    setChatHistory((prev) => [
+      ...prev,
+      { sender: 'user', message: userInput },
+    ]);
 
-      // Append the response to the chat history
+    try {
+      const res = await apiClient.post('/gemini/plan', {
+        projectId: selectedProjectId,
+        userInput,
+      });
+
+      // Add AI response to chat history
+      const formattedResponse = formatTaskPlan(res.data);
       setChatHistory((prev) => [
         ...prev,
-        { user: userInput, response: res.data },
+        { sender: 'ai', message: formattedResponse },
       ]);
       setUserInput(''); // Clear the input field
     } catch (err) {
@@ -60,38 +72,68 @@ const GeminiChatView = () => {
     }
   };
 
-  return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold text-gray-800 mb-4">🤖 Gemini Chatbot</h1>
-      {error && <p className="text-red-500 mb-4">{error}</p>}
+  // Save tasks to the project
+  const handleSaveTasks = async () => {
+    alert('Tasks saved to the project!'); // Placeholder for actual save logic
+  };
 
-      {/* Project Selection and Input Form */}
-      <form onSubmit={handleSubmit} className="space-y-4 mb-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Select Project</label>
-          <select
-            value={selectedProjectId}
-            onChange={(e) => setSelectedProjectId(e.target.value)}
-            className="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500"
+  return (
+    <div className="flex flex-col h-screen bg-gray-100">
+      {/* Header */}
+      <div className="bg-blue-600 text-white p-4 shadow-md">
+        <h1 className="text-2xl font-bold">🤖 Gemini Chatbot</h1>
+      </div>
+
+      {/* Chat History */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {chatHistory.map((chat, index) => (
+          <div
+            key={index}
+            className={`flex ${
+              chat.sender === 'user' ? 'justify-end' : 'justify-start'
+            }`}
           >
-            <option value="">-- Select a Project --</option>
-            {projects.map((project) => (
-              <option key={project.id} value={project.id}>
-                {project.title}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Your Input</label>
-          <textarea
-            value={userInput}
-            onChange={(e) => setUserInput(e.target.value)}
-            className="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500"
-            rows="3"
-            placeholder="Enter your request or guidance for task planning..."
-          ></textarea>
-        </div>
+            <div
+              className={`p-4 rounded-lg shadow-md max-w-lg ${
+                chat.sender === 'user'
+                  ? 'bg-green-500 text-white text-right'
+                  : 'bg-gray-200 text-gray-800 text-left'
+              }`}
+            >
+              {chat.sender === 'ai' ? (
+                <pre className="whitespace-pre-wrap">{chat.message}</pre>
+              ) : (
+                <p>{chat.message}</p>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Input Form */}
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white p-4 shadow-md flex items-center space-x-4"
+      >
+        <select
+          value={selectedProjectId}
+          onChange={(e) => setSelectedProjectId(e.target.value)}
+          className="border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500"
+        >
+          <option value="">-- Select a Project --</option>
+          {projects.map((project) => (
+            <option key={project.id} value={project.id}>
+              {project.title}
+            </option>
+          ))}
+        </select>
+        <textarea
+          value={userInput}
+          onChange={(e) => setUserInput(e.target.value)}
+          className="flex-1 border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500"
+          rows="2"
+          placeholder="Enter your request or guidance for task planning..."
+        ></textarea>
         <button
           type="submit"
           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition disabled:opacity-50"
@@ -101,22 +143,17 @@ const GeminiChatView = () => {
         </button>
       </form>
 
-      {/* Chat History */}
-      <div className="space-y-4">
-        {chatHistory.map((chat, index) => (
-          <div key={index} className="bg-gray-100 p-4 rounded-md shadow-sm">
-            <p className="text-sm text-gray-600">
-              <strong>You:</strong> {chat.user}
-            </p>
-            <p className="text-sm text-gray-600 mt-2">
-              <strong>Gemini:</strong>
-            </p>
-            <pre className="bg-gray-200 p-2 rounded-md text-sm mt-1">
-              {JSON.stringify(chat.response, null, 2)}
-            </pre>
-          </div>
-        ))}
-      </div>
+      {/* Save Tasks Button */}
+      {chatHistory.some((chat) => chat.sender === 'ai') && (
+        <div className="p-4 bg-gray-100 shadow-md">
+          <button
+            onClick={handleSaveTasks}
+            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition"
+          >
+            Save Tasks to Project
+          </button>
+        </div>
+      )}
     </div>
   );
 };
