@@ -30,6 +30,7 @@ async function main() {
       maxHours: 40,
       assignedHours: 0,
       teamId: team.id,
+      password: 'hashed_password_here', // Add hashed password
     },
   });
 
@@ -43,6 +44,7 @@ async function main() {
       maxHours: 40,
       assignedHours: 0,
       teamId: team.id,
+      password: 'hashed_password_here', // Add hashed password
     },
   });
 
@@ -56,6 +58,7 @@ async function main() {
       maxHours: 20,
       assignedHours: 0,
       teamId: team.id,
+      password: 'hashed_password_here', // Add hashed password
     },
   });
 

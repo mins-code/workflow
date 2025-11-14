@@ -3,6 +3,7 @@ import cors from 'cors';
 import { PrismaClient } from '@prisma/client';
 // Import the routes we created
 import projectRoutes from './routes/projectRoutes'; 
+import authRoutes from './routes/authRoutes'; // Import the auth routes
 
 const app = express();
 const prisma = new PrismaClient();
@@ -17,6 +18,8 @@ app.get('/api/health', (req, res) => {
 
 // Connect the Project Routes
 app.use('/api/projects', projectRoutes);
+// Connect the Auth Routes
+app.use('/api/auth', authRoutes); // Use the auth routes at /api/auth
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
