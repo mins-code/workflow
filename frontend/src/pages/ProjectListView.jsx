@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import apiClient from '../api/apiClient'; // Import the centralized API client
 
 const ProjectListView = () => {
   const [projects, setProjects] = useState([]);
@@ -11,10 +11,10 @@ const ProjectListView = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  // Fetch projects and teams on load
+  // Fetch projects and teams
   const fetchProjects = async () => {
     try {
-      const res = await axios.get('http://localhost:3000/api/projects');
+      const res = await apiClient.get('/projects'); // Use apiClient to fetch projects
       setProjects(res.data);
     } catch (err) {
       setError(err.message);
@@ -23,7 +23,7 @@ const ProjectListView = () => {
 
   const fetchTeams = async () => {
     try {
-      const res = await axios.get('http://localhost:3000/api/teams');
+      const res = await apiClient.get('/teams'); // Use apiClient to fetch teams
       setTeams(res.data);
     } catch (err) {
       setError(err.message);
@@ -31,6 +31,16 @@ const ProjectListView = () => {
   };
 
   useEffect(() => {
+    // Retrieve the token from localStorage
+    const token = localStorage.getItem('token');
+
+    // If no token is found, halt data fetching
+    if (!token) {
+      console.warn('No token found. Skipping data fetching.');
+      return;
+    }
+
+    // Fetch data only if the token exists
     fetchProjects();
     fetchTeams();
   }, []);
@@ -54,8 +64,8 @@ const ProjectListView = () => {
     }
 
     try {
-      await axios.put(`http://localhost:3000/api/projects/${selectedProject.id}`, {
-        teamId: selectedTeamId,
+      await apiClient.put(`/projects/${selectedProject.id}`, {
+        teamId: selectedTeamId, // Use apiClient to update the project
       });
 
       // Refresh the project list to reflect the updated team assignment
@@ -78,7 +88,7 @@ const ProjectListView = () => {
     }
 
     try {
-      await axios.delete(`http://localhost:3000/api/projects/${projectId}`);
+      await apiClient.delete(`/projects/${projectId}`); // Use apiClient to delete the project
       await fetchProjects(); // Refresh the project list after deletion
     } catch (err) {
       console.error('Failed to delete project:', err);

@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import Teams from './pages/Teams';
-import ProjectListView from './pages/ProjectListView'; // Import the renamed component
+import ProjectListView from './pages/ProjectListView';
 import NewProject from './pages/NewProject';
-import ProjectDetailView from './pages/ProjectDetailView'; // Import the new Project Detail View
+import ProjectDetailView from './pages/ProjectDetailView';
 import Analytics from './pages/Analytics';
 import AuthForm from './components/AuthForm';
 import CreateTeamPage from './pages/CreateTeamPage';
+import GeminiChatView from './pages/GeminiChatView'; // Import the new Chatbot component
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -46,11 +47,12 @@ const App = () => {
           <Routes>
             <Route path="/teams" element={<Teams />} />
             <Route path="/teams/new" element={<CreateTeamPage />} />
-            <Route path="/projects" element={<ProjectListView />} /> {/* Project List */}
-            <Route path="/projects/new" element={<NewProject />} /> {/* Project Creation */}
-            <Route path="/projects/:projectId" element={<ProjectDetailView />} /> {/* Project Detail */}
+            <Route path="/projects" element={<ProjectListView />} />
+            <Route path="/projects/new" element={<NewProject />} />
+            <Route path="/projects/:projectId" element={<ProjectDetailView />} />
             <Route path="/analytics" element={<Analytics />} />
-            <Route path="*" element={<Navigate to="/projects" />} /> {/* Default to Project List */}
+            <Route path="/chatbot" element={<GeminiChatView />} /> {/* New Chatbot Route */}
+            <Route path="*" element={<Navigate to="/projects" />} />
           </Routes>
         </div>
       </div>

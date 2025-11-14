@@ -41,6 +41,16 @@ const Sidebar = ({ onLogout }) => {
         >
           📊 Analytics
         </NavLink>
+        <NavLink
+          to="/chatbot"
+          className={({ isActive }) =>
+            `block px-4 py-2 rounded-lg font-medium ${
+              isActive ? 'bg-gray-700' : 'hover:bg-gray-800'
+            }`
+          }
+        >
+          🤖 Chatbot
+        </NavLink>
       </nav>
 
       {/* Logout Button */}

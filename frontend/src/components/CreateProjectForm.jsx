@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import apiClient from '../api/apiClient'; // Replace axios with the centralized API client
 
 const CreateProjectForm = ({ isOpen, onClose, onProjectCreated }) => {
   const [formData, setFormData] = useState({
@@ -23,7 +23,8 @@ const CreateProjectForm = ({ isOpen, onClose, onProjectCreated }) => {
     setIsLoading(true);
 
     try {
-      await axios.post('http://localhost:3000/api/projects', {
+      // Use apiClient to send the POST request
+      await apiClient.post('/projects', {
         title: formData.title,
         goal: formData.goal,
         deadline: formData.deadline,
