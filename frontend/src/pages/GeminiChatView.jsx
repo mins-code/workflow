@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import apiClient from '../api/apiClient';
 
 const GeminiChatView = () => {
@@ -8,6 +9,7 @@ const GeminiChatView = () => {
   const [chatHistory, setChatHistory] = useState([]); // Chat history state
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   // Fetch the list of projects
   useEffect(() => {
@@ -61,7 +63,7 @@ const GeminiChatView = () => {
       const formattedResponse = formatTaskPlan(res.data);
       setChatHistory((prev) => [
         ...prev,
-        { sender: 'ai', message: formattedResponse },
+        { sender: 'ai', message: formattedResponse, rawTasks: res.data }, // Store raw tasks for saving
       ]);
       setUserInput(''); // Clear the input field
     } catch (err) {
@@ -74,7 +76,59 @@ const GeminiChatView = () => {
 
   // Save tasks to the project
   const handleSaveTasks = async () => {
-    alert('Tasks saved to the project!'); // Placeholder for actual save logic
+    try {
+      // Helper function to look up a user's ID by their name
+      const lookupUserId = async (name) => {
+        if (!name) return null; // If no name is provided, return null
+        try {
+          const response = await apiClient.get(
+            `/members/find-by-name?name=${encodeURIComponent(name)}`
+          );
+          return response.data?.id || null; // Return the user's ID or null if not found
+        } catch (err) {
+          console.error(`Failed to look up user ID for name "${name}":`, err);
+          return null; // Return null if the lookup fails
+        }
+      };
+
+      // Get the latest AI response from the chat history
+      const latestAIResponse = chatHistory
+        .slice()
+        .reverse()
+        .find((chat) => chat.sender === 'ai' && chat.rawTasks);
+
+      if (!latestAIResponse) {
+        alert('No tasks available to save.');
+        return;
+      }
+
+      const rawTasks = latestAIResponse.rawTasks;
+
+      // Map tasks to include assigneeId and remove idealAssigneeName
+      const tasksToSave = await Promise.all(
+        rawTasks.map(async (task) => {
+          const assigneeId = await lookupUserId(task.idealAssigneeName); // Look up the user ID
+          return {
+            title: task.title,
+            description: task.description,
+            estimatedHours: task.estimatedHours,
+            requiredSkills: task.requiredSkills,
+            projectId: selectedProjectId, // Add the current project ID
+            assigneeId, // Set the assigneeId
+          };
+        })
+      );
+
+      // Send the tasks to the backend
+      await apiClient.post('/projects/tasks/bulk', { tasks: tasksToSave });
+
+      // Show success message and navigate to the projects page
+      alert('Tasks saved successfully!');
+      navigate('/projects');
+    } catch (err) {
+      console.error('Failed to save tasks:', err);
+      alert('Error saving tasks. Please try again.');
+    }
   };
 
   return (

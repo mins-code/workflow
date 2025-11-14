@@ -27,6 +27,7 @@ router.get('/', async (req, res) => {
 
 /**
  * GET /:projectId: Fetch a single project by ID
+ * Includes the full team object and all associated members.
  */
 router.get('/:projectId', async (req, res) => {
   const { projectId } = req.params;
@@ -34,7 +35,14 @@ router.get('/:projectId', async (req, res) => {
   try {
     const project = await prisma.project.findUnique({
       where: { id: projectId },
-      include: { team: true, tasks: true },
+      include: {
+        team: {
+          include: {
+            members: true, // Include all members of the team
+          },
+        },
+        tasks: true, // Include tasks for the project
+      },
     });
 
     if (!project) {
@@ -50,6 +58,7 @@ router.get('/:projectId', async (req, res) => {
 
 /**
  * GET /:projectId/tasks: Fetch all tasks for a specific project
+ * Includes the full assignee object for each task.
  */
 router.get('/:projectId/tasks', async (req, res) => {
   const { projectId } = req.params;
@@ -57,6 +66,9 @@ router.get('/:projectId/tasks', async (req, res) => {
   try {
     const tasks = await prisma.task.findMany({
       where: { projectId },
+      include: {
+        assignee: true, // Include the full assignee object
+      },
     });
 
     res.status(200).json(tasks);
@@ -220,6 +232,45 @@ router.delete('/:projectId', async (req, res) => {
     // Fallback for all other errors
     console.error(`Error deleting project with ID ${projectId}:`, error);
     res.status(500).json({ error: 'Failed to delete project' });
+  }
+});
+
+/**
+ * POST /tasks/bulk: Bulk insert AI-generated tasks into the database.
+ */
+router.post('/tasks/bulk', async (req, res) => {
+  const { tasks } = req.body;
+
+  // Validate the request body
+  if (!Array.isArray(tasks) || tasks.length === 0) {
+    return res.status(400).json({ error: 'Invalid request: tasks must be a non-empty array.' });
+  }
+
+  try {
+    // Prepare the tasks for insertion
+    const formattedTasks = tasks.map((task) => ({
+      title: task.title,
+      description: task.description,
+      estimatedHours: task.estimatedHours,
+      requiredSkills: JSON.stringify(task.requiredSkills), // Serialize requiredSkills
+      status: task.status || 'TODO', // Default status to 'TODO' if not provided
+      projectId: task.projectId, // Ensure projectId is included in each task
+      assigneeId: task.assigneeId || null, // Optional assigneeId
+    }));
+
+    // Insert tasks into the database using createMany
+    const result = await prisma.task.createMany({
+      data: formattedTasks,
+    });
+
+    // Return a success message
+    res.status(201).json({
+      message: 'Tasks inserted successfully.',
+      count: result.count, // Number of tasks inserted
+    });
+  } catch (error) {
+    console.error('Error inserting tasks:', error);
+    res.status(500).json({ error: 'Failed to insert tasks.' });
   }
 });
 

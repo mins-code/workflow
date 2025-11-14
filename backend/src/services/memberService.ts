@@ -139,6 +139,22 @@ export class MemberService {
             throw new Error('Failed to delete member');
         }
     }
+
+    /**
+     * Find a user by their name.
+     * @param name - The name of the user to find.
+     */
+    async findUserByName(name: string) {
+        try {
+            const user = await prisma.user.findFirst({
+                where: { name },
+            });
+            return user;
+        } catch (error) {
+            console.error(`Error finding user by name "${name}":`, error);
+            throw new Error('Failed to find user by name');
+        }
+    }
 }
 
 export default new MemberService();

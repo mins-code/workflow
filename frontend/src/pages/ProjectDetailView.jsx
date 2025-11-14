@@ -90,6 +90,22 @@ const ProjectDetailView = () => {
         Deadline: {new Date(project.deadline).toLocaleDateString()}
       </p>
 
+      {/* Assigned Team Members Section */}
+      <div className="bg-white p-4 rounded-lg shadow-md mb-6">
+        <h2 className="text-xl font-bold text-gray-800 mb-4">Assigned Team Members</h2>
+        {project.team && project.team.members.length > 0 ? (
+          <ul className="list-disc pl-6">
+            {project.team.members.map((member) => (
+              <li key={member.id} className="text-gray-700">
+                {member.name} - {member.role}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-gray-500">No team members assigned to this project.</p>
+        )}
+      </div>
+
       <div className="grid grid-cols-3 gap-6">
         {/* To Do Column */}
         <div
@@ -107,6 +123,13 @@ const ProjectDetailView = () => {
             >
               <h3 className="text-lg font-semibold text-blue-600">{task.title}</h3>
               <p className="text-sm text-gray-500">Status: {task.status}</p>
+              <span
+                className={`inline-block mt-2 px-3 py-1 text-sm font-medium rounded-full ${
+                  task.assignee ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                }`}
+              >
+                {task.assignee?.name || 'Unassigned'}
+              </span>
             </div>
           ))}
         </div>
@@ -125,7 +148,12 @@ const ProjectDetailView = () => {
               draggable
               onDragStart={(e) => handleDragStart(e, task.id)}
             >
-              <h3 className="text-lg font-semibold text-yellow-600">{task.title}</h3>
+              <h3 className="text-lg font-semibold text-yellow-600">
+                {task.title}
+                {task.assignee && (
+                  <span className="text-sm text-gray-500"> (Assigned to: {task.assignee.name})</span>
+                )}
+              </h3>
               <p className="text-sm text-gray-500">Status: {task.status}</p>
             </div>
           ))}
@@ -145,7 +173,12 @@ const ProjectDetailView = () => {
               draggable
               onDragStart={(e) => handleDragStart(e, task.id)}
             >
-              <h3 className="text-lg font-semibold text-green-600">{task.title}</h3>
+              <h3 className="text-lg font-semibold text-green-600">
+                {task.title}
+                {task.assignee && (
+                  <span className="text-sm text-gray-500"> (Assigned to: {task.assignee.name})</span>
+                )}
+              </h3>
               <p className="text-sm text-gray-500">Status: {task.status}</p>
             </div>
           ))}

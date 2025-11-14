@@ -20,6 +20,25 @@ router.get('/', async (req, res) => {
 });
 
 /**
+ * GET /find-by-name: Find a user by their name.
+ */
+router.get('/find-by-name', async (req, res) => {
+  const { name } = req.query;
+
+  if (!name) {
+    return res.status(400).json({ error: 'Name query parameter is required.' });
+  }
+
+  try {
+    const user = await memberService.findUserByName(name as string);
+    res.status(200).json(user || null); // Return the user object or null if not found
+  } catch (error: any) {
+    console.error('Error finding user by name:', error.message);
+    res.status(500).json({ error: 'Failed to find user by name' });
+  }
+});
+
+/**
  * POST /onboard: Onboard a new team member.
  */
 router.post('/onboard', async (req, res) => {
