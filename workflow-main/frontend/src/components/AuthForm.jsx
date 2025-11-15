@@ -8,7 +8,7 @@ const AuthForm = ({ onAuthSuccess }) => {
         email: '',
         password: '',
         name: '', 
-        role: 'Team Member' // Default role
+        role: 'Team Member'
     });
     const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -38,7 +38,7 @@ const AuthForm = ({ onAuthSuccess }) => {
                     email: formData.email, 
                     password: formData.password, 
                     name: formData.name, 
-                    role: formData.role // Include role in signup
+                    role: formData.role
                 }; 
 
             const response = await axios.post(url, payload);
@@ -48,7 +48,6 @@ const AuthForm = ({ onAuthSuccess }) => {
                 onAuthSuccess();
                 navigate('/dashboard'); 
             } else {
-                // Signup Success: Switch to login mode
                 setIsLogin(true);
                 setFormData({ email: '', password: '', name: '', role: 'Team Member' });
                 alert('Signup successful! Please log in.');
@@ -61,37 +60,49 @@ const AuthForm = ({ onAuthSuccess }) => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100">
-            <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-                <h2 className="text-2xl font-bold mb-6 text-center text-black">
-                    {isLogin ? 'Log In' : 'Sign Up'}
-                </h2>
-                {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+        <div className="min-h-screen flex items-center justify-center bg-dark-bg p-4">
+            <div className="app-card w-full max-w-md">
+                <div className="text-center mb-8">
+                    <div className="w-16 h-16 rounded-2xl bg-gradient-primary flex items-center justify-center text-white font-bold shadow-glow mx-auto mb-4 text-2xl">
+                        WF
+                    </div>
+                    <h2 className="text-3xl font-bold text-dark-text mb-2">
+                        {isLogin ? 'Welcome Back' : 'Create Account'}
+                    </h2>
+                    <p className="text-dark-text-secondary">
+                        {isLogin ? 'Sign in to continue to Workflow' : 'Sign up to get started'}
+                    </p>
+                </div>
                 
-                <form onSubmit={handleSubmit} className="space-y-4">
+                {error && (
+                    <div className="mb-6 p-4 rounded-xl bg-error bg-opacity-10 border border-error">
+                        <p className="text-error text-sm">{error}</p>
+                    </div>
+                )}
+                
+                <form onSubmit={handleSubmit} className="space-y-5">
                     {!isLogin && (
                         <>
                             <div>
-                                <label className="block text-sm font-medium text-black">Name</label>
+                                <label className="app-label">Full Name</label>
                                 <input
                                     type="text"
                                     name="name"
                                     value={formData.name}
                                     onChange={handleChange}
-                                    className="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500 text-black"
-                                    placeholder="Your Name"
+                                    className="app-input"
+                                    placeholder="John Doe"
                                     required={!isLogin}
                                 />
                             </div>
                             
-                            {/* Role Selection Dropdown */}
                             <div>
-                                <label className="block text-sm font-medium text-black">Role</label>
+                                <label className="app-label">Role</label>
                                 <select
                                     name="role"
                                     value={formData.role}
                                     onChange={handleChange}
-                                    className="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500 text-black"
+                                    className="app-select"
                                     required={!isLogin}
                                 >
                                     <option value="Team Member">Team Member</option>
@@ -101,61 +112,70 @@ const AuthForm = ({ onAuthSuccess }) => {
                                     <option value="Backend Lead">Backend Lead</option>
                                     <option value="Junior Dev">Junior Developer</option>
                                 </select>
-                                <p className="text-xs text-black mt-1">
-                                    Note: Only Managers and Senior Developers can assign tasks
+                                <p className="text-xs text-dark-muted mt-2">
+                                    💡 Only Managers and Senior Developers can assign tasks
                                 </p>
                             </div>
                         </>
                     )}
                     
                     <div>
-                        <label className="block text-sm font-medium text-black">Email</label>
+                        <label className="app-label">Email Address</label>
                         <input
                             type="email"
                             name="email"
                             value={formData.email}
                             onChange={handleChange}
-                            className="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500 text-black"
-                            placeholder="Your Email"
+                            className="app-input"
+                            placeholder="you@company.com"
                             required
                         />
                     </div>
                     
                     <div>
-                        <label className="block text-sm font-medium text-black">Password</label>
+                        <label className="app-label">Password</label>
                         <input
                             type="password"
                             name="password"
                             value={formData.password}
                             onChange={handleChange}
-                            className="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500 text-black"
-                            placeholder="Your Password"
+                            className="app-input"
+                            placeholder="••••••••"
                             required
                         />
                     </div>
 
                     <button
                         type="submit"
-                        className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition disabled:opacity-50 font-semibold"
+                        className="w-full btn-primary"
                         disabled={isLoading}
                     >
-                        {isLoading ? (isLogin ? 'Logging in...' : 'Signing up...') : isLogin ? 'Log In' : 'Sign Up'}
+                        {isLoading ? (
+                            <span className="flex items-center justify-center gap-2">
+                                <span className="animate-spin">⏳</span>
+                                {isLogin ? 'Signing in...' : 'Creating account...'}
+                            </span>
+                        ) : (
+                            isLogin ? 'Sign In' : 'Create Account'
+                        )}
                     </button>
                 </form>
 
-                <p className="text-sm text-black mt-4 text-center">
-                    {isLogin ? "Don't have an account?" : 'Already have an account?'}{' '}
-                    <button
-                        onClick={() => { 
-                            setIsLogin(!isLogin); 
-                            setError(null);
-                            setFormData({ email: '', password: '', name: '', role: 'Team Member' });
-                        }}
-                        className="text-blue-500 hover:underline"
-                    >
-                        {isLogin ? 'Sign Up' : 'Log In'}
-                    </button>
-                </p>
+                <div className="mt-6 text-center">
+                    <p className="text-sm text-dark-text-secondary">
+                        {isLogin ? "Don't have an account?" : 'Already have an account?'}{' '}
+                        <button
+                            onClick={() => { 
+                                setIsLogin(!isLogin); 
+                                setError(null);
+                                setFormData({ email: '', password: '', name: '', role: 'Team Member' });
+                            }}
+                            className="text-primary hover:text-secondary font-semibold transition-colors"
+                        >
+                            {isLogin ? 'Sign Up' : 'Sign In'}
+                        </button>
+                    </p>
+                </div>
             </div>
         </div>
     );

@@ -6,12 +6,11 @@ const GeminiChatView = () => {
   const [projects, setProjects] = useState([]);
   const [selectedProjectId, setSelectedProjectId] = useState('');
   const [userInput, setUserInput] = useState('');
-  const [chatHistory, setChatHistory] = useState([]); // Chat history state
+  const [chatHistory, setChatHistory] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  // Fetch the list of projects
   useEffect(() => {
     const fetchProjects = async () => {
       try {
@@ -26,7 +25,6 @@ const GeminiChatView = () => {
     fetchProjects();
   }, []);
 
-  // Utility function to format the task plan JSON into readable text
   const formatTaskPlan = (tasks) => {
     return tasks
       .map(
@@ -36,7 +34,6 @@ const GeminiChatView = () => {
       .join('\n\n');
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!selectedProjectId || !userInput) {
@@ -47,7 +44,6 @@ const GeminiChatView = () => {
     setIsLoading(true);
     setError(null);
 
-    // Add user input to chat history
     setChatHistory((prev) => [
       ...prev,
       { sender: 'user', message: userInput },
@@ -59,13 +55,12 @@ const GeminiChatView = () => {
         userInput,
       });
 
-      // Add AI response to chat history
       const formattedResponse = formatTaskPlan(res.data);
       setChatHistory((prev) => [
         ...prev,
-        { sender: 'ai', message: formattedResponse, rawTasks: res.data }, // Store raw tasks for saving
+        { sender: 'ai', message: formattedResponse, rawTasks: res.data },
       ]);
-      setUserInput(''); // Clear the input field
+      setUserInput('');
     } catch (err) {
       setError('Failed to generate task plan.');
       console.error(err);
@@ -74,24 +69,21 @@ const GeminiChatView = () => {
     }
   };
 
-  // Save tasks to the project
   const handleSaveTasks = async () => {
     try {
-      // Helper function to look up a user's ID by their name
       const lookupUserId = async (name) => {
-        if (!name) return null; // If no name is provided, return null
+        if (!name) return null;
         try {
           const response = await apiClient.get(
             `/members/find-by-name?name=${encodeURIComponent(name)}`
           );
-          return response.data?.id || null; // Return the user's ID or null if not found
+          return response.data?.id || null;
         } catch (err) {
           console.error(`Failed to look up user ID for name "${name}":`, err);
-          return null; // Return null if the lookup fails
+          return null;
         }
       };
 
-      // Get the latest AI response from the chat history
       const latestAIResponse = chatHistory
         .slice()
         .reverse()
@@ -104,25 +96,22 @@ const GeminiChatView = () => {
 
       const rawTasks = latestAIResponse.rawTasks;
 
-      // Map tasks to include assigneeId and remove idealAssigneeName
       const tasksToSave = await Promise.all(
         rawTasks.map(async (task) => {
-          const assigneeId = await lookupUserId(task.idealAssigneeName); // Look up the user ID
+          const assigneeId = await lookupUserId(task.idealAssigneeName);
           return {
             title: task.title,
             description: task.description,
             estimatedHours: task.estimatedHours,
             requiredSkills: task.requiredSkills,
-            projectId: selectedProjectId, // Add the current project ID
-            assigneeId, // Set the assigneeId
+            projectId: selectedProjectId,
+            assigneeId,
           };
         })
       );
 
-      // Send the tasks to the backend
       await apiClient.post('/projects/tasks/bulk', { tasks: tasksToSave });
 
-      // Show success message and navigate to the projects page
       alert('Tasks saved successfully!');
       navigate('/projects');
     } catch (err) {
@@ -132,69 +121,109 @@ const GeminiChatView = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-100">
+    <div className="flex flex-col h-screen">
       {/* Header */}
-      <div className="bg-blue-600 text-white p-4 shadow-md">
-        <h1 className="text-2xl font-bold">🤖 Gemini Chatbot</h1>
+      <div className="bg-gradient-primary p-6 shadow-glow">
+        <div className="flex items-center gap-3">
+          <span className="text-3xl">🤖</span>
+          <div>
+            <h1 className="text-2xl font-bold text-white">AI Task Planner</h1>
+            <p className="text-white text-opacity-80 text-sm">Generate intelligent task breakdowns for your projects</p>
+          </div>
+        </div>
       </div>
 
       {/* Chat History */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {chatHistory.map((chat, index) => (
-          <div
-            key={index}
-            className={`flex ${
-              chat.sender === 'user' ? 'justify-end' : 'justify-start'
-            }`}
-          >
-            <div
-              className={`p-4 rounded-lg shadow-md max-w-lg ${
-                chat.sender === 'user'
-                  ? 'bg-green-500 text-white text-right'
-                  : 'bg-gray-200 text-gray-800 text-left'
-              }`}
-            >
-              {chat.sender === 'ai' ? (
-                <pre className="whitespace-pre-wrap">{chat.message}</pre>
-              ) : (
-                <p>{chat.message}</p>
-              )}
+      <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-dark-bg">
+        {chatHistory.length === 0 ? (
+          <div className="h-full flex items-center justify-center">
+            <div className="text-center max-w-2xl">
+              <span className="text-6xl mb-4 block">💬</span>
+              <h2 className="app-subheading mb-2">Start a Conversation</h2>
+              <p className="text-dark-text-secondary">
+                Select a project and describe your requirements. I'll help you break it down into actionable tasks.
+              </p>
             </div>
           </div>
-        ))}
+        ) : (
+          chatHistory.map((chat, index) => (
+            <div
+              key={index}
+              className={`flex ${chat.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+            >
+              <div
+                className={`max-w-3xl rounded-2xl p-4 shadow-card ${
+                  chat.sender === 'user'
+                    ? 'bg-gradient-primary text-white'
+                    : 'app-card'
+                }`}
+              >
+                {chat.sender === 'ai' ? (
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-xl">🤖</span>
+                      <span className="text-primary font-semibold">AI Assistant</span>
+                    </div>
+                    <pre className="whitespace-pre-wrap text-dark-text font-sans leading-relaxed">
+                      {chat.message}
+                    </pre>
+                  </div>
+                ) : (
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-xl">👤</span>
+                      <span className="font-semibold">You</span>
+                    </div>
+                    <p className="leading-relaxed">{chat.message}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))
+        )}
+        {isLoading && (
+          <div className="flex justify-start">
+            <div className="app-card max-w-3xl">
+              <div className="flex items-center gap-3">
+                <span className="text-xl">🤖</span>
+                <span className="text-primary font-semibold">AI Assistant is thinking...</span>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Input Form */}
       <form
         onSubmit={handleSubmit}
-        className="bg-white p-4 shadow-md flex items-center space-x-4"
+        className="bg-dark-surface border-t border-dark-border p-4 shadow-card"
       >
-        <div className="flex items-center gap-4 w-full">
+        <div className="flex items-center gap-4 max-w-6xl mx-auto">
           <select
             value={selectedProjectId}
             onChange={(e) => setSelectedProjectId(e.target.value)}
-            className="text-black border rounded px-2 py-1 w-1/6"
+            className="app-select w-64"
           >
-            <option value="" className="text-black">
-              -- Select a Project --
-            </option>
+            <option value="">Select Project</option>
             {projects.map((project) => (
               <option key={project.id} value={project.id}>
                 {project.title}
               </option>
             ))}
           </select>
+          
           <input
             type="text"
             value={userInput}
             onChange={(e) => setUserInput(e.target.value)}
-            className="text-black border rounded px-2 py-1 w-4/6"
-            placeholder="Enter your request or guidance for task planning..."
+            className="app-input flex-1"
+            placeholder="Describe your task requirements..."
           />
+          
           <button
             type="submit"
-            className="bg-blue-500 text-white px-4 py-2 rounded w-1/6 hover:bg-blue-600 transition disabled:opacity-50"
-            disabled={isLoading}
+            className="btn-primary px-8"
+            disabled={isLoading || !selectedProjectId || !userInput}
           >
             {isLoading ? 'Generating...' : 'Send'}
           </button>
@@ -203,13 +232,16 @@ const GeminiChatView = () => {
 
       {/* Save Tasks Button */}
       {chatHistory.some((chat) => chat.sender === 'ai') && (
-        <div className="p-4 bg-gray-100 shadow-md">
-          <button
-            onClick={handleSaveTasks}
-            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition"
-          >
-            Save Tasks to Project
-          </button>
+        <div className="p-4 bg-dark-surface border-t border-dark-border">
+          <div className="max-w-6xl mx-auto flex justify-end">
+            <button
+              onClick={handleSaveTasks}
+              className="btn-primary flex items-center gap-2"
+            >
+              <span>💾</span>
+              Save Tasks to Project
+            </button>
+          </div>
         </div>
       )}
     </div>

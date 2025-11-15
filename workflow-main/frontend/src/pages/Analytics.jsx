@@ -2,13 +2,12 @@ import React, { useState, useEffect } from 'react';
 import apiClient from '../api/apiClient';
 
 const Analytics = () => {
-  const [teams, setTeams] = useState([]); // List of all teams
-  const [selectedTeamId, setSelectedTeamId] = useState(null); // Selected team ID for drill-down
-  const [analyticsData, setAnalyticsData] = useState(null); // Analytics data (global or team-specific)
+  const [teams, setTeams] = useState([]);
+  const [selectedTeamId, setSelectedTeamId] = useState(null);
+  const [analyticsData, setAnalyticsData] = useState(null);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch all teams on load
   useEffect(() => {
     const fetchTeams = async () => {
       try {
@@ -23,7 +22,6 @@ const Analytics = () => {
     fetchTeams();
   }, []);
 
-  // Fetch analytics data (global or team-specific) based on `selectedTeamId`
   useEffect(() => {
     const fetchAnalytics = async () => {
       setIsLoading(true);
@@ -31,8 +29,8 @@ const Analytics = () => {
 
       try {
         const url = selectedTeamId
-          ? `/analytics/teams/${selectedTeamId}/summary` // Team-specific analytics
-          : '/analytics/summary'; // Global analytics
+          ? `/analytics/teams/${selectedTeamId}/summary`
+          : '/analytics/summary';
         const response = await apiClient.get(url);
         setAnalyticsData(response.data);
       } catch (err) {
@@ -46,42 +44,72 @@ const Analytics = () => {
     fetchAnalytics();
   }, [selectedTeamId]);
 
-  // REMOVED: The getUtilizationColor function is no longer needed.
-
   if (isLoading) {
-    return <div className="p-10 text-dark-text">Loading analytics data...</div>;
+    return (
+      <div className="p-10 flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="text-6xl mb-4">📊</div>
+          <p className="text-dark-text text-lg">Loading analytics data...</p>
+        </div>
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="p-10 text-red-400 font-bold">❌ {error}</div>;
+    return (
+      <div className="p-10">
+        <div className="app-card bg-error bg-opacity-10 border-error">
+          <p className="text-error font-bold">❌ {error}</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-dark-bg p-8 font-sans">
-      <h1 className="text-3xl font-bold text-dark-text mb-6">📊 Analytics Dashboard</h1>
+    <div className="min-h-screen p-8">
+      <div className="mb-8">
+        <h1 className="app-heading mb-2">📊 Analytics Dashboard</h1>
+        <p className="text-dark-text-secondary">Track team performance and workload distribution</p>
+      </div>
 
       {/* Team Selection */}
-      <div className="mb-6">
-        <h2 className="text-xl font-semibold text-black mb-4">Select a Team</h2>
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold text-dark-text mb-4">Select View</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div
-            className={`p-4 rounded-lg shadow-md cursor-pointer ${
-              !selectedTeamId ? 'bg-dark-accent text-dark-bg' : 'bg-dark-surface text-dark-text'
+            className={`app-card cursor-pointer transition-all ${
+              !selectedTeamId ? 'bg-gradient-primary text-white shadow-glow' : 'hover:shadow-card-hover'
             }`}
             onClick={() => setSelectedTeamId(null)}
           >
-            <h3 className="text-lg font-bold">🌍 Global Summary</h3>
+            <div className="flex items-center gap-3">
+              <span className="text-3xl">🌍</span>
+              <div>
+                <h3 className="text-lg font-bold">Global Summary</h3>
+                <p className={`text-sm ${!selectedTeamId ? 'text-white text-opacity-80' : 'text-dark-text-secondary'}`}>
+                  All teams
+                </p>
+              </div>
+            </div>
           </div>
+          
           {teams.map((team) => (
             <div
               key={team.id}
-              className={`p-4 rounded-lg shadow-md cursor-pointer ${
-                selectedTeamId === team.id ? 'bg-dark-accent text-dark-bg' : 'bg-dark-surface text-dark-text'
+              className={`app-card cursor-pointer transition-all ${
+                selectedTeamId === team.id ? 'bg-gradient-primary text-white shadow-glow' : 'hover:shadow-card-hover'
               }`}
               onClick={() => setSelectedTeamId(team.id)}
             >
-              <h3 className="text-lg font-bold">{team.name}</h3>
-              <p className="text-sm text-dark-muted">{team.description || 'No description available'}</p>
+              <div className="flex items-center gap-3">
+                <span className="text-3xl">👥</span>
+                <div>
+                  <h3 className="text-lg font-bold">{team.name}</h3>
+                  <p className={`text-sm ${selectedTeamId === team.id ? 'text-white text-opacity-80' : 'text-dark-text-secondary'}`}>
+                    {team.description || 'Team analytics'}
+                  </p>
+                </div>
+              </div>
             </div>
           ))}
         </div>
@@ -90,29 +118,44 @@ const Analytics = () => {
       {/* Analytics Cards */}
       {analyticsData && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* Total Members Card - Using Dark Theme Card Styles */}
-          <div className="bg-dark-surface p-6 rounded-lg shadow-md">
-            <h2 className="text-lg font-semibold text-dark-muted">Total Members</h2>
-            <p className="text-4xl font-bold text-dark-text">{analyticsData.totalMembers}</p>
+          {/* Total Members Card */}
+          <div className="app-card bg-gradient-to-br from-blue-500 to-blue-600 text-white">
+            <div className="flex items-start justify-between mb-4">
+              <h2 className="text-sm font-semibold opacity-90">Total Members</h2>
+              <span className="text-3xl">👥</span>
+            </div>
+            <p className="text-5xl font-bold">{analyticsData.totalMembers}</p>
+            <p className="text-sm opacity-80 mt-2">Active team members</p>
           </div>
 
-          {/* Total Projects Card - Using Dark Theme Card Styles */}
-          <div className="bg-dark-surface p-6 rounded-lg shadow-md">
-            <h2 className="text-lg font-semibold text-dark-muted">Total Projects</h2>
-            <p className="text-4xl font-bold text-dark-text">{analyticsData.totalProjects}</p>
+          {/* Total Projects Card */}
+          <div className="app-card bg-gradient-to-br from-purple-500 to-purple-600 text-white">
+            <div className="flex items-start justify-between mb-4">
+              <h2 className="text-sm font-semibold opacity-90">Total Projects</h2>
+              <span className="text-3xl">📁</span>
+            </div>
+            <p className="text-5xl font-bold">{analyticsData.totalProjects}</p>
+            <p className="text-sm opacity-80 mt-2">Active projects</p>
           </div>
 
-          {/* Average Utilization Card - NOW USING STATIC DARK THEME STYLES */}
-          <div className="bg-dark-surface p-6 rounded-lg shadow-md">
-            <h2 className="text-lg font-semibold text-dark-muted">Average Utilization</h2>
-            <p className="text-4xl font-bold text-dark-text">{(analyticsData.avgUtilization * 100).toFixed(0)}%</p>
+          {/* Average Utilization Card */}
+          <div className="app-card bg-gradient-to-br from-green-500 to-green-600 text-white">
+            <div className="flex items-start justify-between mb-4">
+              <h2 className="text-sm font-semibold opacity-90">Avg Utilization</h2>
+              <span className="text-3xl">📈</span>
+            </div>
+            <p className="text-5xl font-bold">{(analyticsData.avgUtilization * 100).toFixed(0)}%</p>
+            <p className="text-sm opacity-80 mt-2">Team capacity used</p>
           </div>
 
-          {/* Skill Gap Alerts Card - Using Dark Theme Card Styles */}
-          <div className="bg-dark-surface p-6 rounded-lg shadow-md">
-            <h2 className="text-lg font-semibold text-dark-muted">Skill Gap Alerts</h2>
-            {/* Keeping the red color for the alert count as a visual cue */}
-            <p className="text-4xl font-bold text-red-400">{analyticsData.skillGapAlerts}</p>
+          {/* Skill Gap Alerts Card */}
+          <div className="app-card bg-gradient-to-br from-orange-500 to-red-500 text-white">
+            <div className="flex items-start justify-between mb-4">
+              <h2 className="text-sm font-semibold opacity-90">Skill Gaps</h2>
+              <span className="text-3xl">⚠️</span>
+            </div>
+            <p className="text-5xl font-bold">{analyticsData.skillGapAlerts}</p>
+            <p className="text-sm opacity-80 mt-2">Identified gaps</p>
           </div>
         </div>
       )}
