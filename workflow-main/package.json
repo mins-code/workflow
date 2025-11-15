@@ -1,0 +1,13 @@
+{
+  "name": "workflow-monorepo",
+  "version": "0.0.1",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "start:frontend": "npm --workspace frontend run dev",
+    "start:backend": "npm --workspace backend run start"
+  }
+}
