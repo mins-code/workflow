@@ -17,23 +17,25 @@ export default function Sidebar({ onLogout }) {
       <div>
         <div className="mb-6">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-mb-500 to-mb-700 flex items-center justify-center text-white font-bold shadow">
-              MB
+            {/* UPDATED GRADIENT HERE */}
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold shadow">
+              WF
             </div>
             <div>
               <div className="mb-h1">Workflow</div>
-              <div className="text-sm mb-muted">Magic Bento theme</div>
+              {/* This will now use your new 'secondary' color via .mb-muted */}
             </div>
           </div>
         </div>
 
         <Card soft className="overflow-hidden">
-          <nav className="flex flex-col gap-1">
+          <nav className="flex flex-col space-y-2">
             {nav.map((n) => (
               <Link
                 key={n.label}
                 to={n.to}
-                className="block px-3 py-2 rounded-xl hover:bg-gray-50 hover:translate-x-1 transition transform"
+                /* Updated hover to use a neutral slate color */
+                className="block px-3 py-2 rounded-xl hover:bg-slate-100 hover:translate-x-1 transition transform"
               >
                 {n.label}
               </Link>
