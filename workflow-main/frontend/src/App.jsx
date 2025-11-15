@@ -42,8 +42,8 @@ const App = () => {
     <Router>
       <div className="flex">
         <Sidebar onLogout={handleLogout} />
-
-        <div className="flex-1 ml-64 p-6 bg-gray-100 min-h-screen">
+        {/* CHANGE: Change bg-gray-100 to the new main-bg color class */}
+        <div className="flex-1 ml-64 p-6 bg-main-bg min-h-screen">
           <Routes>
             <Route path="/teams" element={<Teams />} />
             <Route path="/teams/new" element={<CreateTeamPage />} />

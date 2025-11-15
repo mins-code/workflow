@@ -18,9 +18,6 @@ export default function Sidebar({ onLogout }) {
         <div className="mb-6">
           <div className="flex items-center gap-3">
             {/* UPDATED GRADIENT HERE */}
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold shadow">
-              WF
-            </div>
             <div>
               <div className="mb-h1">Workflow</div>
               {/* This will now use your new 'secondary' color via .mb-muted */}
