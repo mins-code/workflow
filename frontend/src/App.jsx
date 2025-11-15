@@ -51,8 +51,8 @@ const App = () => {
             <Route path="/projects/new" element={<NewProject />} />
             <Route path="/projects/:projectId" element={<ProjectDetailView />} />
             <Route path="/analytics" element={<Analytics />} />
-            <Route path="/chatbot" element={<GeminiChatView />} /> {/* New Chatbot Route */}
-            <Route path="*" element={<Navigate to="/projects" />} />
+            <Route path="/chatbot" element={<GeminiChatView />} /> {/* Correctly mapped Chatbot route */}
+            <Route path="*" element={<Navigate to="/projects" />} /> {/* Default route */}
           </Routes>
         </div>
       </div>
