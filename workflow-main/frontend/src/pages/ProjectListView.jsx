@@ -1,20 +1,20 @@
+// frontend/src/pages/ProjectListView.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import apiClient from '../api/apiClient'; // Import the centralized API client
+import apiClient from '../api/apiClient';
 
 const ProjectListView = () => {
   const [projects, setProjects] = useState([]);
-  const [teams, setTeams] = useState([]); // State to store the list of teams
-  const [selectedProject, setSelectedProject] = useState(null); // Project selected for team assignment
-  const [selectedTeamId, setSelectedTeamId] = useState(''); // Team selected in the dropdown
-  const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
+  const [teams, setTeams] = useState([]);
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [selectedTeamId, setSelectedTeamId] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  // Fetch projects and teams
   const fetchProjects = async () => {
     try {
-      const res = await apiClient.get('/projects'); // Use apiClient to fetch projects
+      const res = await apiClient.get('/projects');
       setProjects(res.data);
     } catch (err) {
       setError(err.message);
@@ -23,7 +23,7 @@ const ProjectListView = () => {
 
   const fetchTeams = async () => {
     try {
-      const res = await apiClient.get('/teams'); // Use apiClient to fetch teams
+      const res = await apiClient.get('/teams');
       setTeams(res.data);
     } catch (err) {
       setError(err.message);
@@ -31,32 +31,24 @@ const ProjectListView = () => {
   };
 
   useEffect(() => {
-    // Retrieve the token from localStorage
     const token = localStorage.getItem('token');
-
-    // If no token is found, halt data fetching
     if (!token) {
       console.warn('No token found. Skipping data fetching.');
       return;
     }
-
-    // Fetch data only if the token exists
     fetchProjects();
     fetchTeams();
   }, []);
 
-  // Open the modal for team assignment
   const handleAssignTeamClick = (project) => {
     setSelectedProject(project);
     setIsModalOpen(true);
   };
 
-  // Handle team selection in the dropdown
   const handleTeamChange = (e) => {
     setSelectedTeamId(e.target.value);
   };
 
-  // Submit the team assignment
   const handleAssignTeamSubmit = async () => {
     if (!selectedTeamId) {
       alert('Please select a team.');
@@ -65,13 +57,9 @@ const ProjectListView = () => {
 
     try {
       await apiClient.put(`/projects/${selectedProject.id}`, {
-        teamId: selectedTeamId, // Use apiClient to update the project
+        teamId: selectedTeamId,
       });
-
-      // Refresh the project list to reflect the updated team assignment
       await fetchProjects();
-
-      // Close the modal and reset the state
       setIsModalOpen(false);
       setSelectedProject(null);
       setSelectedTeamId('');
@@ -81,15 +69,14 @@ const ProjectListView = () => {
     }
   };
 
-  // Handle project deletion
   const handleDeleteProject = async (projectId) => {
     if (!window.confirm('Are you sure you want to delete this project?')) {
       return;
     }
 
     try {
-      await apiClient.delete(`/projects/${projectId}`); // Use apiClient to delete the project
-      await fetchProjects(); // Refresh the project list after deletion
+      await apiClient.delete(`/projects/${projectId}`);
+      await fetchProjects();
     } catch (err) {
       console.error('Failed to delete project:', err);
       alert('Error deleting project. Please try again.');
@@ -97,59 +84,69 @@ const ProjectListView = () => {
   };
 
   if (error) {
-    return <div className="p-10 text-red-500 font-bold">❌ Error: {error}</div>;
+    return (
+      <div className="p-10">
+        <div className="app-card bg-error bg-opacity-10 border-error">
+          <p className="text-error font-bold">❌ Error: {error}</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-page-bg-light p-8 font-sans">
-      <div className="flex justify-between items-center mb-6">
-        {/* CHANGE: Update text color class to Rich Black (text-rich-black) */}
-        <h1 className="text-dark-bg text-4xl font-bold">📂 Project Management</h1>
+    <div className="min-h-screen p-8">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="app-heading">📂 Project Management</h1>
         <button
           onClick={() => navigate('/projects/new')}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
+          className="btn-primary"
         >
           + New Project
         </button>
       </div>
 
       <div className="grid gap-6">
-        {/* Ensure loading text is dark */}
-        {projects.length === 0 && <p className="text-gray-800">Loading projects or no data found...</p>}
+        {projects.length === 0 && (
+          <div className="app-card text-center py-12">
+            <p className="text-dark-muted text-lg">No projects found. Create your first project!</p>
+          </div>
+        )}
 
         {projects.map((project) => (
-          <div
-            key={project.id}
-            // CHANGE 2: Set card background to the lighter color (Periwinkle 2)
-            className="bg-card-bg-light p-6 rounded-xl shadow-lg border border-gray-300"
-          >
-            <h2 className="text-2xl font-bold text-blue-600">{project.title}</h2>
-            <p className="text-gray-700">{project.goal}</p>
-            {/* Using a neutral gray for muted text against the light card */}
-            <p className="text-sm text-gray-600">
-              Deadline: {new Date(project.deadline).toLocaleDateString()}
-            </p>
-            <p className="text-sm text-gray-600">
-              Assigned Team: {project.team ? project.team.name : 'None'}
-            </p>
-            <div className="flex space-x-4 mt-4">
+          <div key={project.id} className="app-card">
+            <div className="flex justify-between items-start mb-4">
+              <div className="flex-1">
+                <h2 className="text-2xl font-bold text-dark-text mb-2">{project.title}</h2>
+                <p className="text-dark-text-secondary mb-3">{project.goal}</p>
+                <div className="flex gap-4 text-sm text-dark-muted">
+                  <span className="flex items-center gap-1">
+                    📅 Deadline: {new Date(project.deadline).toLocaleDateString()}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    👥 Team: {project.team ? project.team.name : 'None'}
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex gap-3 mt-4">
               <button
                 onClick={() => navigate(`/projects/${project.id}`)}
-                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition"
+                className="btn-primary flex-1"
               >
-                Decompose Project
+                📋 View Tasks
               </button>
               <button
                 onClick={() => handleAssignTeamClick(project)}
-                className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition"
+                className="btn-secondary"
               >
-                Assign Team
+                👥 Assign Team
               </button>
               <button
                 onClick={() => handleDeleteProject(project.id)}
-                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
+                className="btn-danger"
               >
-                Delete
+                🗑️ Delete
               </button>
             </div>
           </div>
@@ -158,38 +155,46 @@ const ProjectListView = () => {
 
       {/* Assign Team Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative">
+        <div className="app-modal">
+          <div className="app-modal-content">
             <button
               onClick={() => setIsModalOpen(false)}
-              className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
+              className="absolute top-4 right-4 text-dark-muted hover:text-dark-text transition-colors"
             >
-              ✕
+              <span className="text-2xl">✕</span>
             </button>
-            <h2 className="text-xl font-bold mb-4">Assign Team to Project</h2>
-            <p className="text-gray-600 mb-4">
-              Assigning team to: <strong>{selectedProject?.title}</strong>
+            
+            <h2 className="app-subheading mb-6">Assign Team to Project</h2>
+            <p className="text-dark-text-secondary mb-4">
+              Assigning team to: <strong className="text-dark-text">{selectedProject?.title}</strong>
             </p>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">Select Team</label>
+            
+            <div className="mb-6">
+              <label className="app-label">Select Team</label>
               <select
-    value={selectedTeamId}
-    onChange={handleTeamChange}
-    className="w-full border-2 border-gray-400 rounded-md p-3 focus:ring-blue-500 focus:border-blue-500 text-gray-900 font-medium bg-white"
-    style={{ color: '#1f2937' }}
->
-    <option value="" className="text-gray-900 font-medium">-- Select a Team --</option>
-    {teams.map((team) => (
-        <option key={team.id} value={team.id} className="text-gray-900 font-medium">
-            {team.name}
-        </option>
-    ))}
-</select>
+                value={selectedTeamId}
+                onChange={handleTeamChange}
+                className="app-select"
+              >
+                <option value="">-- Select a Team --</option>
+                {teams.map((team) => (
+                  <option key={team.id} value={team.id}>
+                    {team.name}
+                  </option>
+                ))}
+              </select>
             </div>
-            <div className="flex justify-end">
+            
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="btn-secondary"
+              >
+                Cancel
+              </button>
               <button
                 onClick={handleAssignTeamSubmit}
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
+                className="btn-primary"
               >
                 Assign Team
               </button>

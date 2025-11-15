@@ -1,3 +1,4 @@
+// frontend/src/pages/ProjectDetailView.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
@@ -6,14 +7,13 @@ const ProjectDetailView = () => {
   const { projectId } = useParams();
   const [project, setProject] = useState(null);
   const [tasks, setTasks] = useState([]);
-  const [allUsers, setAllUsers] = useState([]); // All available users
+  const [allUsers, setAllUsers] = useState([]);
   const [error, setError] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   const [selectedAssigneeId, setSelectedAssigneeId] = useState('');
 
-  // Fetch current user info from token
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
@@ -26,7 +26,6 @@ const ProjectDetailView = () => {
     }
   }, []);
 
-  // Fetch all users for assignment dropdown
   const fetchAllUsers = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -39,7 +38,6 @@ const ProjectDetailView = () => {
     }
   };
 
-  // Fetch project details and tasks
   const fetchProjectDetails = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -66,22 +64,18 @@ const ProjectDetailView = () => {
     fetchAllUsers();
   }, [projectId]);
 
-  // Check if current user is a manager
   const isManager = () => {
     return currentUser && (currentUser.role === 'Manager' || currentUser.role === 'Senior Dev');
   };
 
-  // Handle drag start
   const handleDragStart = (e, taskId) => {
     e.dataTransfer.setData('taskId', taskId);
   };
 
-  // Handle drag over
   const handleDragOver = (e) => {
     e.preventDefault();
   };
 
-  // Handle drop (status change)
   const handleDrop = async (e, newStatus) => {
     const taskId = e.dataTransfer.getData('taskId');
     const token = localStorage.getItem('token');
@@ -104,7 +98,6 @@ const ProjectDetailView = () => {
     }
   };
 
-  // Open assign modal
   const handleAssignClick = (task) => {
     if (!isManager()) {
       alert('Only managers can assign tasks');
@@ -115,7 +108,6 @@ const ProjectDetailView = () => {
     setIsAssignModalOpen(true);
   };
 
-  // Handle manual assignment
   const handleManualAssign = async () => {
     if (!selectedTask) return;
 
@@ -127,7 +119,6 @@ const ProjectDetailView = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      // Update the task in local state
       setTasks((prevTasks) =>
         prevTasks.map((task) =>
           task.id === selectedTask.id ? response.data : task
@@ -137,8 +128,6 @@ const ProjectDetailView = () => {
       setIsAssignModalOpen(false);
       setSelectedTask(null);
       setSelectedAssigneeId('');
-      
-      // Show success message
       alert('Task assigned successfully!');
     } catch (err) {
       console.error('Failed to assign task:', err);
@@ -150,207 +139,169 @@ const ProjectDetailView = () => {
     }
   };
 
-  // Filter tasks by status
   const tasksByStatus = (status) => tasks.filter((task) => task.status === status);
 
+  const statusConfig = {
+    TODO: { label: 'To Do', color: 'border-primary', bgColor: 'bg-primary bg-opacity-10' },
+    IN_PROGRESS: { label: 'In Progress', color: 'border-warning', bgColor: 'bg-warning bg-opacity-10' },
+    DONE: { label: 'Done', color: 'border-success', bgColor: 'bg-success bg-opacity-10' },
+  };
+
   if (error) {
-    return <div className="p-10 text-red-500 font-bold">❌ Error: {error}</div>;
+    return (
+      <div className="p-10">
+        <div className="app-card bg-error bg-opacity-10 border-error">
+          <p className="text-error font-bold">❌ Error: {error}</p>
+        </div>
+      </div>
+    );
   }
 
   if (!project) {
-    return <div className="p-10 text-gray-500">Loading project details...</div>;
+    return (
+      <div className="p-10">
+        <div className="app-card">
+          <p className="text-dark-muted">Loading project details...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-[#e0e1dd] p-8 font-sans">
-      <h1 className="text-dark-bg">📂 Project Management</h1>
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">{project.title}</h1>
-      <p className="text-gray-600 mb-4">{project.goal}</p>
-      <p className="text-sm text-gray-400 mb-6">
-        Deadline: {new Date(project.deadline).toLocaleDateString()}
-      </p>
+    <div className="min-h-screen p-8">
+      {/* Project Header */}
+      <div className="app-card mb-6">
+        <h1 className="app-heading mb-4">{project.title}</h1>
+        <p className="text-dark-text-secondary mb-4">{project.goal}</p>
+        <div className="flex gap-6 text-sm text-dark-muted">
+          <span>📅 Deadline: {new Date(project.deadline).toLocaleDateString()}</span>
+          <span>👥 Team: {project.team?.name || 'None'}</span>
+        </div>
+      </div>
 
       {/* User Role Indicator */}
       {currentUser && (
-        <div className="mb-4 p-3 bg-blue-100 rounded-lg">
-          <p className="text-sm text-gray-800 font-medium">
+        <div className="app-card mb-6 bg-primary bg-opacity-10 border-primary">
+          <p className="text-dark-text">
             Logged in as: <strong>{currentUser.email}</strong> ({currentUser.role})
-            {isManager() && <span className="ml-2 text-green-700 font-semibold">✓ Can assign tasks</span>}
+            {isManager() && <span className="ml-2 text-success font-semibold">✓ Can assign tasks</span>}
           </p>
         </div>
       )}
 
-      {/* Assigned Team Members Section */}
-      <div className="bg-white p-4 rounded-lg shadow-md mb-6">
-        <h2 className="text-xl font-bold text-gray-800 mb-4">Assigned Team Members</h2>
+      {/* Team Members */}
+      <div className="app-card mb-6">
+        <h2 className="app-subheading mb-4">Team Members</h2>
         {project.team && project.team.members.length > 0 ? (
-          <ul className="list-disc pl-6">
+          <div className="flex flex-wrap gap-2">
             {project.team.members.map((member) => (
-              <li key={member.id} className="text-gray-800 font-medium">
+              <span key={member.id} className="px-3 py-1 bg-dark-surface-light rounded-full text-dark-text text-sm">
                 {member.name} - {member.role}
-              </li>
+              </span>
             ))}
-          </ul>
+          </div>
         ) : (
-          <p className="text-gray-600 font-medium">No team members assigned to this project.</p>
+          <p className="text-dark-muted">No team members assigned to this project.</p>
         )}
       </div>
 
+      {/* Task Board */}
       <div className="grid grid-cols-3 gap-6">
-        {/* To Do Column */}
-        <div
-          className="bg-white p-4 rounded-lg shadow-md"
-          onDragOver={handleDragOver}
-          onDrop={(e) => handleDrop(e, 'TODO')}
-        >
-          <h2 className="text-xl font-bold text-gray-800 mb-4">To Do</h2>
-          {tasksByStatus('TODO').map((task) => (
+        {['TODO', 'IN_PROGRESS', 'DONE'].map((status) => {
+          const config = statusConfig[status];
+          return (
             <div
-              key={task.id}
-              className="bg-gray-100 p-4 rounded-md shadow-sm mb-4 cursor-pointer relative"
-              draggable
-              onDragStart={(e) => handleDragStart(e, task.id)}
+              key={status}
+              className={`app-card ${config.bgColor} border-2 ${config.color}`}
+              onDragOver={handleDragOver}
+              onDrop={(e) => handleDrop(e, status)}
             >
-              <h3 className="text-lg font-semibold text-blue-600">{task.title}</h3>
-              <p className="text-sm text-gray-700 font-medium">Status: {task.status}</p>
-              <span
-                className={`inline-block mt-2 px-3 py-1 text-sm font-bold rounded-full ${
-                  task.assignee ? 'bg-green-100 text-green-900' : 'bg-red-100 text-red-900'
-                }`}
-              >
-                {task.assignee?.name || 'Unassigned'}
-              </span>
-              {task.assignee && (
-                <p className="text-xs text-gray-700 font-medium mt-1">
-                  Capacity: {task.assignee.maxHours} hrs
-                </p>
-              )}
-              {isManager() && (
-                <button
-                  onClick={() => handleAssignClick(task)}
-                  className="absolute top-2 right-2 bg-blue-500 text-white px-2 py-1 text-xs rounded hover:bg-blue-600 font-semibold"
-                >
-                  Assign
-                </button>
-              )}
+              <h2 className="app-subheading mb-4">{config.label}</h2>
+              <div className="space-y-3">
+                {tasksByStatus(status).map((task) => (
+                  <div
+                    key={task.id}
+                    className="bg-dark-surface p-4 rounded-xl shadow-card cursor-move hover:shadow-card-hover transition-all relative"
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, task.id)}
+                  >
+                    <h3 className="text-lg font-semibold text-dark-text mb-2">{task.title}</h3>
+                    <p className="text-sm text-dark-text-secondary mb-3">{task.description}</p>
+                    
+                    {task.assignee ? (
+                      <div className="flex items-center gap-2 text-sm">
+                        <span className="px-2 py-1 bg-success bg-opacity-20 text-success rounded-full font-semibold">
+                          👤 {task.assignee.name}
+                        </span>
+                      </div>
+                    ) : (
+                      <span className="text-sm px-2 py-1 bg-error bg-opacity-20 text-error rounded-full font-semibold">
+                        Unassigned
+                      </span>
+                    )}
+                    
+                    {isManager() && (
+                      <button
+                        onClick={() => handleAssignClick(task)}
+                        className="absolute top-2 right-2 px-2 py-1 bg-primary text-white text-xs rounded-lg hover:bg-primary-hover transition-colors"
+                      >
+                        Assign
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
-          ))}
-        </div>
-
-        {/* In Progress Column */}
-        <div
-          className="bg-white p-4 rounded-lg shadow-md"
-          onDragOver={handleDragOver}
-          onDrop={(e) => handleDrop(e, 'IN_PROGRESS')}
-        >
-          <h2 className="text-xl font-bold text-gray-800 mb-4">In Progress</h2>
-          {tasksByStatus('IN_PROGRESS').map((task) => (
-            <div
-              key={task.id}
-              className="bg-yellow-100 p-4 rounded-md shadow-sm mb-4 cursor-pointer relative"
-              draggable
-              onDragStart={(e) => handleDragStart(e, task.id)}
-            >
-              <h3 className="text-lg font-semibold text-yellow-700">
-                {task.title}
-                {task.assignee && (
-                  <span className="text-sm text-gray-700 font-medium"> (Assigned to: {task.assignee.name})</span>
-                )}
-              </h3>
-              <p className="text-sm text-gray-700 font-medium">Status: {task.status}</p>
-              {isManager() && (
-                <button
-                  onClick={() => handleAssignClick(task)}
-                  className="absolute top-2 right-2 bg-blue-500 text-white px-2 py-1 text-xs rounded hover:bg-blue-600 font-semibold"
-                >
-                  Reassign
-                </button>
-              )}
-            </div>
-          ))}
-        </div>
-
-        {/* Done Column */}
-        <div
-          className="bg-white p-4 rounded-lg shadow-md"
-          onDragOver={handleDragOver}
-          onDrop={(e) => handleDrop(e, 'DONE')}
-        >
-          <h2 className="text-xl font-bold text-gray-800 mb-4">Done</h2>
-          {tasksByStatus('DONE').map((task) => (
-            <div
-              key={task.id}
-              className="bg-green-100 p-4 rounded-md shadow-sm mb-4 cursor-pointer relative"
-              draggable
-              onDragStart={(e) => handleDragStart(e, task.id)}
-            >
-              <h3 className="text-lg font-semibold text-green-700">
-                {task.title}
-                {task.assignee && (
-                  <span className="text-sm text-gray-700 font-medium"> (Assigned to: {task.assignee.name})</span>
-                )}
-              </h3>
-              <p className="text-sm text-gray-700 font-medium">Status: {task.status}</p>
-              {isManager() && (
-                <button
-                  onClick={() => handleAssignClick(task)}
-                  className="absolute top-2 right-2 bg-blue-500 text-white px-2 py-1 text-xs rounded hover:bg-blue-600 font-semibold"
-                >
-                  Reassign
-                </button>
-              )}
-            </div>
-          ))}
-        </div>
+          );
+        })}
       </div>
 
       {/* Assignment Modal */}
       {isAssignModalOpen && selectedTask && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative">
+        <div className="app-modal">
+          <div className="app-modal-content">
             <button
               onClick={() => setIsAssignModalOpen(false)}
-              className="absolute top-3 right-3 text-gray-700 hover:text-gray-900 font-bold text-xl"
+              className="absolute top-4 right-4 text-dark-muted hover:text-dark-text transition-colors"
             >
-              ✕
+              <span className="text-2xl">✕</span>
             </button>
-            <h2 className="text-xl font-bold mb-4 text-gray-800">Assign Task</h2>
-            <p className="text-gray-700 mb-4 font-medium">
-              Task: <strong className="text-gray-900">{selectedTask.title}</strong>
+            
+            <h2 className="app-subheading mb-6">Assign Task</h2>
+            <p className="text-dark-text-secondary mb-4">
+              Task: <strong className="text-dark-text">{selectedTask.title}</strong>
             </p>
-            <div className="mb-4">
-              <label className="block text-sm font-bold text-gray-800 mb-2">Select Team Member</label>
+            
+            <div className="mb-6">
+              <label className="app-label">Select Team Member</label>
               <select
                 value={selectedAssigneeId}
                 onChange={(e) => setSelectedAssigneeId(e.target.value)}
-                className="w-full border-2 border-gray-400 rounded-md p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 font-medium bg-white"
-                style={{ color: '#1f2937' }}
+                className="app-select"
               >
-                <option value="" className="text-gray-900 font-medium">-- Unassign Task --</option>
+                <option value="">-- Unassign Task --</option>
                 {allUsers.length > 0 ? (
                   allUsers.map((user) => (
-                    <option key={user.id} value={user.id} className="text-gray-900 font-medium">
+                    <option key={user.id} value={user.id}>
                       {user.name} ({user.role})
                     </option>
                   ))
                 ) : (
-                  <option disabled className="text-gray-600">No users available</option>
+                  <option disabled>No users available</option>
                 )}
               </select>
-              <p className="text-xs text-gray-600 mt-2 font-medium">
-                {allUsers.length} user(s) available for assignment
-              </p>
             </div>
+            
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setIsAssignModalOpen(false)}
-                className="bg-gray-400 text-gray-900 px-4 py-2 rounded hover:bg-gray-500 transition font-semibold"
+                className="btn-secondary"
               >
                 Cancel
               </button>
               <button
                 onClick={handleManualAssign}
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition font-semibold"
+                className="btn-primary"
               >
                 Assign Task
               </button>

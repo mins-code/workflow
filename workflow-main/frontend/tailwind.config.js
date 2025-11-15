@@ -4,68 +4,48 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-
-        // --- Dark Mode Palette ---
-        'dark-bg': '#0d1b2a',          // Rich Black
-        'dark-surface': '#1b263b',     // Oxford Blue
-        'dark-surface-light': '#415a77', // Yinmn Blue (for subtle borders/hover)
-        'dark-accent': '#778da9',      // Silver Lake Blue
-        'dark-text': '#e0e1dd',        // Platinum
-        'dark-muted': '#415a77',       // Yinmn Blue
+        // Modern Dark Theme Palette
+        'dark-bg': '#0a0e1a',          // Deeper rich black
+        'dark-bg-secondary': '#0f1419', // Secondary background
+        'dark-surface': '#1a1f2e',     // Card backgrounds
+        'dark-surface-light': '#252b3b', // Hover states
+        'dark-border': '#2d3548',      // Borders
         
-        // ... (existing dark mode colors)
+        // Accent Colors
+        'primary': '#6366f1',          // Indigo - Primary actions
+        'primary-hover': '#4f46e5',    // Darker indigo
+        'secondary': '#8b5cf6',        // Purple - Secondary actions
+        'accent': '#06b6d4',           // Cyan - Highlights
+        'accent-hover': '#0891b2',     // Darker cyan
         
-        // --- New Periwinkle Palette (for Project View) ---
-        'page-bg-light': '#e0e1dd',     // Jordy Blue (Darker Background)
-        'card-bg-light': '#e0e1dd',     // Periwinkle 2 (Lighter Card)
-        'periwinkle-mid': '#b6ccfe',    // Periwinkle 3 (Mid-tone)
-        'dark-text-color': '#0f1724',   // Reintroduce dark text for light backgrounds
-
-        // ... (rest of the colors)
-
-        mb: {
-          50:  '#0d1b2a',
-          100: '#1b263b', 
-          200: '#415a77', 
-          300: '#778da9',
-          400: '#778da9',
-          500: '#778da9', // primary accent (Silver Lake Blue)
-          600: '#415a77', // secondary accent/darker gradient (Yinmn Blue)
-          700: '#415a77',
-          800: '#415a77',
-          900: '#e0e1dd' // primary text (Platinum)
-        },
-
-        neutral: {
-          50: '#1b263b',
-          100: '#1b263b',
-          200: '#415a77',
-          300: '#778da9',
-          400: '#778da9',
-          500: '#778da9',
-          600: '#778da9',
-          700: '#e0e1dd',
-          800: '#e0e1dd',
-          900: '#e0e1dd'
-        },
-        glass: 'rgba(255,255,255,0.1)'
+        // Text Colors
+        'dark-text': '#f0f4f8',        // Primary text - High contrast
+        'dark-text-secondary': '#cbd5e1', // Secondary text
+        'dark-muted': '#94a3b8',       // Muted text
+        
+        // Status Colors
+        'success': '#10b981',
+        'success-dark': '#059669',
+        'warning': '#f59e0b',
+        'warning-dark': '#d97706',
+        'error': '#ef4444',
+        'error-dark': '#dc2626',
+        
+        // Light backgrounds for forms (with good contrast)
+        'input-bg': '#1e293b',
+        'input-border': '#334155',
+        'input-focus': '#3b82f6',
       },
-      borderRadius: {
-        'xl-2': '1.25rem',
-        '2xl-3': '1.75rem'
+      backgroundImage: {
+        'gradient-primary': 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+        'gradient-secondary': 'linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%)',
+        'gradient-surface': 'linear-gradient(135deg, #1a1f2e 0%, #252b3b 100%)',
       },
       boxShadow: {
-        // Darker shadows for dark mode subtlety
-        'mb-soft': '0 6px 20px rgba(11,24,39,0.2)',
-        'mb-elev': '0 10px 30px rgba(11,24,39,0.3)'
+        'card': '0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2)',
+        'card-hover': '0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3)',
+        'glow': '0 0 20px rgba(99, 102, 241, 0.3)',
       },
-      fontFamily: {
-        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial'],
-      },
-      spacing: {
-        '72': '18rem',
-        '84': '21rem',
-      }
     }
   },
   plugins: [
