@@ -120,9 +120,13 @@ const Teams = () => {
   };
 
   return (
+    // Assuming the background is dark (bg-dark-bg/bg-dark-surface)
     <div className="p-6">
-      <h1 className="text-2xl font-bold text-gray-800 mb-4">Team Management</h1>
+      {/* CHANGE: Update text color class to Platinum (#e0e1dd) */}
+      <h1 className="text-2xl font-bold text-dark-text mb-4">Team Management</h1>
       {error && <p className="text-red-500">{error}</p>}
+
+      {/* Create New Team Button */}
 
       {/* Create New Team Button */}
       <button
@@ -141,8 +145,8 @@ const Teams = () => {
               className="bg-white p-4 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition relative"
               onClick={() => handleTeamClick(team)}
             >
-              <h2 className="text-xl font-bold text-gray-800">{team.name}</h2>
-              <p className="text-gray-600">{team.description}</p>
+              <h2 className="text-xl font-bold text-black">{team.name}</h2>
+              <p className="text-black">{team.description}</p>
               <p className="text-sm text-gray-500 mt-2">
                 Members: {members.filter((member) => member.teamId === team.id).length}
               </p>
@@ -165,26 +169,31 @@ const Teams = () => {
       </div>
 
       {/* Team Detail Modal */}
+      {/* Team Detail Modal */}
       {isTeamModalOpen && selectedTeam && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl relative">
+          {/* CHANGE: Modal background to dark surface */}
+          <div className="bg-dark-surface p-6 rounded-lg shadow-lg w-full max-w-2xl relative">
             <button
               onClick={closeTeamModal}
-              className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
+              // CHANGE: Set close button color to Platinum (text-dark-text)
+              className="absolute top-3 right-3 text-dark-text hover:text-dark-accent"
             >
               ✕
             </button>
-            <h2 className="text-2xl font-bold mb-4">{selectedTeam.name}</h2>
-            <p className="text-gray-600 mb-4">{selectedTeam.description}</p>
+            {/* CHANGE: Set text colors to Platinum (text-dark-text) */}
+            <h2 className="text-2xl font-bold mb-4 text-dark-text">{selectedTeam.name}</h2>
+            <p className="text-dark-text mb-4">{selectedTeam.description}</p>
 
-            <h3 className="text-xl font-semibold mb-2">Team Members</h3>
+            <h3 className="text-xl font-semibold mb-2 text-dark-text">Team Members</h3>
             <ul className="space-y-2">
               {members
                 .filter((member) => member.teamId === selectedTeamId)
                 .map((member) => (
                   <li
                     key={member.id}
-                    className="bg-gray-100 p-2 rounded-md cursor-pointer hover:bg-gray-200"
+                    // CHANGE: List item background to darkest color (rich-black) and use dark-text
+                    className="bg-dark-bg p-2 rounded-md cursor-pointer hover:bg-dark-surface-light text-dark-text"
                     onClick={() => handleMemberClick(member)}
                   >
                     {member.name} - {member.role}
@@ -194,70 +203,83 @@ const Teams = () => {
           </div>
         </div>
       )}
-
+      
       {/* Edit Member Modal */}
       {isEditMemberModalOpen && memberToEdit && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md relative">
+          {/* CHANGE: Modal background to dark surface */}
+          <div className="bg-dark-surface p-6 rounded-lg shadow-lg w-full max-w-md relative">
             <button
               onClick={closeEditMemberModal}
-              className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
+              // CHANGE: Set close button color to Platinum (text-dark-text)
+              className="absolute top-3 right-3 text-dark-text hover:text-dark-accent"
             >
               ✕
             </button>
-            <h2 className="text-xl font-bold mb-4">Edit Member</h2>
+            <h2 className="text-xl font-bold mb-4 text-dark-text">Edit Member</h2>
             <form onSubmit={handleUpdateMemberDetails} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Name</label>
+                {/* CHANGE: Label text color */}
+                <label className="block text-sm font-medium text-dark-text">Name</label>
                 <input
                   type="text"
                   value={memberToEdit.name}
                   onChange={(e) => setMemberToEdit({ ...memberToEdit, name: e.target.value })}
-                  className="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500"
+                  // CHANGE: Input styles to dark background/light text/accent borders
+                  className="w-full border border-dark-accent rounded-md p-2 focus:ring-dark-accent focus:border-dark-accent bg-dark-bg text-dark-text"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Email</label>
+                {/* CHANGE: Label text color */}
+                <label className="block text-sm font-medium text-dark-text">Email</label>
                 <input
                   type="email"
                   value={memberToEdit.email}
                   disabled
-                  className="w-full border border-gray-300 rounded-md p-2 bg-gray-100"
+                  // CHANGE: Disabled input styles to dark background/muted text
+                  className="w-full border border-dark-accent rounded-md p-2 bg-dark-bg text-dark-muted"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Role</label>
+                {/* CHANGE: Label text color */}
+                <label className="block text-sm font-medium text-dark-text">Role</label>
                 <input
                   type="text"
                   value={memberToEdit.role}
                   onChange={(e) => setMemberToEdit({ ...memberToEdit, role: e.target.value })}
-                  className="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500"
+                  // CHANGE: Input styles
+                  className="w-full border border-dark-accent rounded-md p-2 focus:ring-dark-accent focus:border-dark-accent bg-dark-bg text-dark-text"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Max Hours</label>
+                {/* CHANGE: Label text color */}
+                <label className="block text-sm font-medium text-dark-text">Max Hours</label>
                 <input
                   type="number"
                   value={memberToEdit.maxHours}
                   onChange={(e) => setMemberToEdit({ ...memberToEdit, maxHours: e.target.value })}
-                  className="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500"
+                  // CHANGE: Input styles
+                  className="w-full border border-dark-accent rounded-md p-2 focus:ring-dark-accent focus:border-dark-accent bg-dark-bg text-dark-text"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Skills (JSON)</label>
+                {/* CHANGE: Label text color */}
+                <label className="block text-sm font-medium text-dark-text">Skills (JSON)</label>
                 <textarea
                   value={memberToEdit.skills}
                   onChange={(e) => setMemberToEdit({ ...memberToEdit, skills: e.target.value })}
-                  className="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500"
+                  // CHANGE: Textarea styles
+                  className="w-full border border-dark-accent rounded-md p-2 focus:ring-dark-accent focus:border-dark-accent bg-dark-bg text-dark-text"
                   rows="3"
                 ></textarea>
               </div>
               <div className="flex justify-end">
                 <button
                   type="submit"
+                  // Buttons are kept blue/white but should be checked against dark theme constraints
                   className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
                 >
                   Save Changes

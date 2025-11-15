@@ -83,7 +83,9 @@ const ProjectDetailView = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8 font-sans">
+    // CHANGE: Set the main background to Platinum (#e0e1dd)
+    <div className="min-h-screen bg-[#e0e1dd] p-8 font-sans">
+      <h1 className="text-dark-bg">📂 Project Management</h1>
       <h1 className="text-3xl font-bold text-gray-800 mb-6">{project.title}</h1>
       <p className="text-gray-600 mb-4">{project.goal}</p>
       <p className="text-sm text-gray-400 mb-6">

@@ -13,11 +13,15 @@ const nav = [
 
 export default function Sidebar({ onLogout }) {
   return (
-    <aside className="w-72 h-screen p-6 bg-transparent flex flex-col justify-between">
+    <aside className="w-72 h-screen p-6 bg-dark-surface flex flex-col justify-between">
       <div>
         <div className="mb-6">
           <div className="flex items-center gap-3">
+            
             {/* UPDATED GRADIENT HERE */}
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold shadow">
+              WF
+            </div>
             <div>
               <div className="mb-h1">Workflow</div>
               {/* This will now use your new 'secondary' color via .mb-muted */}
@@ -32,7 +36,8 @@ export default function Sidebar({ onLogout }) {
                 key={n.label}
                 to={n.to}
                 /* Updated hover to use a neutral slate color */
-                className="block px-3 py-2 rounded-xl hover:bg-slate-100 hover:translate-x-1 transition transform"
+                // CHANGE: Use text-dark-text (Platinum) and font-bold for max visibility
+                className="block px-3 py-2 rounded-xl hover:bg-dark-bg hover:translate-x-1 transition transform text-dark-text font-bold"
               >
                 {n.label}
               </Link>
@@ -45,7 +50,7 @@ export default function Sidebar({ onLogout }) {
       <div className="mt-6">
         <button
           onClick={onLogout}
-          className="w-full bg-red-500 text-white px-4 py-2 rounded-xl text-center font-semibold hover:bg-red-600 transition"
+          className="w-full bg-red-500 text-dark-text px-4 py-2 rounded-xl text-center font-semibold hover:bg-red-600 transition"
         >
           Logout
         </button>

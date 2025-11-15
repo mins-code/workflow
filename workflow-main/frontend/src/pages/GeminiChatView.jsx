@@ -169,32 +169,36 @@ const GeminiChatView = () => {
         onSubmit={handleSubmit}
         className="bg-white p-4 shadow-md flex items-center space-x-4"
       >
-        <select
-          value={selectedProjectId}
-          onChange={(e) => setSelectedProjectId(e.target.value)}
-          className="border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500"
-        >
-          <option value="">-- Select a Project --</option>
-          {projects.map((project) => (
-            <option key={project.id} value={project.id}>
-              {project.title}
+        <div className="flex items-center gap-4 w-full">
+          <select
+            value={selectedProjectId}
+            onChange={(e) => setSelectedProjectId(e.target.value)}
+            className="text-black border rounded px-2 py-1 w-1/6"
+          >
+            <option value="" className="text-black">
+              -- Select a Project --
             </option>
-          ))}
-        </select>
-        <textarea
-          value={userInput}
-          onChange={(e) => setUserInput(e.target.value)}
-          className="flex-1 border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500"
-          rows="2"
-          placeholder="Enter your request or guidance for task planning..."
-        ></textarea>
-        <button
-          type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition disabled:opacity-50"
-          disabled={isLoading}
-        >
-          {isLoading ? 'Generating...' : 'Send'}
-        </button>
+            {projects.map((project) => (
+              <option key={project.id} value={project.id}>
+                {project.title}
+              </option>
+            ))}
+          </select>
+          <input
+            type="text"
+            value={userInput}
+            onChange={(e) => setUserInput(e.target.value)}
+            className="text-black border rounded px-2 py-1 w-4/6"
+            placeholder="Enter your request or guidance for task planning..."
+          />
+          <button
+            type="submit"
+            className="bg-blue-500 text-white px-4 py-2 rounded w-1/6 hover:bg-blue-600 transition disabled:opacity-50"
+            disabled={isLoading}
+          >
+            {isLoading ? 'Generating...' : 'Send'}
+          </button>
+        </div>
       </form>
 
       {/* Save Tasks Button */}

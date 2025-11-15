@@ -5,19 +5,20 @@
 
 /* Base tweaks for Magic Bento style */
 :root {
-  --mb-accent: #6fd39d;
-  --mb-accent-600: #4dbf7e;
-  --mb-bg: #fbfbfb;
-  --mb-surface: #ffffff;
-  --mb-muted: #73858f;
+  /* DARK MODE COLORS */
+  --mb-accent: #778da9;       /* Silver Lake Blue (Link/Button Accent) */
+  --mb-accent-600: #415a77;   /* Yinmn Blue (Darker Accent) */
+  --mb-bg: #0d1b2a;           /* Rich Black (Main Background) */
+  --mb-surface: #1b263b;      /* Oxford Blue (Card/Surface Background) */
+  --mb-muted: #778da9;        /* Silver Lake Blue (Muted Text) */
+  --mb-text-primary: #e0e1dd; /* Platinum (Primary Text) */
 }
-
 @layer base {
   html, body, #root {
     height: 100%;
-    background: linear-gradient(180deg, rgba(247,250,249,1) 0%, rgba(255,255,255,1) 100%);
+    background: var(--mb-bg);
     font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-    color: #0f1724;
+    color: var(--mb-text-primary);
   }
   a { color: var(--mb-accent); }
 }
@@ -26,23 +27,30 @@
 @layer components {
   .mb-card {
     @apply bg-white rounded-2xl-3 shadow-mb-elev p-6;
-    border: 1px solid rgba(15,21,36,0.04);
+    background-color: var(--mb-surface); 
+    /* CHANGE: Adjust border for dark mode */
+    border: 1px solid rgba(119, 141, 169, 0.2);
   }
 
   .mb-soft-card {
-    @apply bg-white rounded-xl-2 shadow-mb-soft p-4;
-    border: 1px solid rgba(15,21,36,0.03);
+    @apply rounded-xl-2 shadow-mb-soft p-4;
+    background-color: var(--mb-bg); 
+    /* CHANGE: Adjust border for soft card */
+    border: 1px solid rgba(119, 141, 169, 0.1); 
   }
 
   .mb-btn {
+    /* Keep gradient with new colors */
     @apply inline-flex items-center justify-center px-4 py-2 rounded-2xl text-sm font-semibold shadow;
     background: linear-gradient(90deg,var(--mb-accent) 0%, var(--mb-accent-600) 100%);
-    color: white;
+    /* CHANGE: Use dark text on bright button */
+    color: #0d1b2a; 
   }
   .mb-btn-outline {
     @apply inline-flex items-center justify-center px-4 py-2 rounded-2xl text-sm font-semibold border;
-    border-color: rgba(15,21,36,0.06);
-    color: #0f1724;
+    border-color: rgba(119, 141, 169, 0.5); 
+    /* CHANGE: Light text on dark button */
+    color: var(--mb-text-primary); 
     background: transparent;
   }
 
@@ -50,6 +58,7 @@
     @apply block w-full rounded-xl p-3 border;
     border-color: rgba(15,21,36,0.06);
     background: rgba(250,251,252,0.9);
+    color: #0f1724; /* CHANGE: Ensure text color is dark (#0f1724 is Rich Black equivalent) */
   }
 
   .mb-h1 {

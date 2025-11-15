@@ -46,32 +46,27 @@ const Analytics = () => {
     fetchAnalytics();
   }, [selectedTeamId]);
 
-  // Determine the color for avgUtilization based on its value
-  const getUtilizationColor = (utilization) => {
-    if (utilization > 0.75) return 'bg-green-100 text-green-800';
-    if (utilization >= 0.5) return 'bg-yellow-100 text-yellow-800';
-    return 'bg-red-100 text-red-800';
-  };
+  // REMOVED: The getUtilizationColor function is no longer needed.
 
   if (isLoading) {
-    return <div className="p-10 text-gray-500">Loading analytics data...</div>;
+    return <div className="p-10 text-dark-text">Loading analytics data...</div>;
   }
 
   if (error) {
-    return <div className="p-10 text-red-500 font-bold">❌ {error}</div>;
+    return <div className="p-10 text-red-400 font-bold">❌ {error}</div>;
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8 font-sans">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">📊 Analytics Dashboard</h1>
+    <div className="min-h-screen bg-dark-bg p-8 font-sans">
+      <h1 className="text-3xl font-bold text-dark-text mb-6">📊 Analytics Dashboard</h1>
 
       {/* Team Selection */}
       <div className="mb-6">
-        <h2 className="text-xl font-semibold text-gray-700 mb-4">Select a Team</h2>
+        <h2 className="text-xl font-semibold text-black mb-4">Select a Team</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div
             className={`p-4 rounded-lg shadow-md cursor-pointer ${
-              !selectedTeamId ? 'bg-blue-500 text-white' : 'bg-white text-gray-800'
+              !selectedTeamId ? 'bg-dark-accent text-dark-bg' : 'bg-dark-surface text-dark-text'
             }`}
             onClick={() => setSelectedTeamId(null)}
           >
@@ -81,12 +76,12 @@ const Analytics = () => {
             <div
               key={team.id}
               className={`p-4 rounded-lg shadow-md cursor-pointer ${
-                selectedTeamId === team.id ? 'bg-blue-500 text-white' : 'bg-white text-gray-800'
+                selectedTeamId === team.id ? 'bg-dark-accent text-dark-bg' : 'bg-dark-surface text-dark-text'
               }`}
               onClick={() => setSelectedTeamId(team.id)}
             >
               <h3 className="text-lg font-bold">{team.name}</h3>
-              <p className="text-sm">{team.description || 'No description available'}</p>
+              <p className="text-sm text-dark-muted">{team.description || 'No description available'}</p>
             </div>
           ))}
         </div>
@@ -95,28 +90,29 @@ const Analytics = () => {
       {/* Analytics Cards */}
       {analyticsData && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* Total Members Card */}
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-lg font-semibold text-gray-600">Total Members</h2>
-            <p className="text-4xl font-bold text-gray-800">{analyticsData.totalMembers}</p>
+          {/* Total Members Card - Using Dark Theme Card Styles */}
+          <div className="bg-dark-surface p-6 rounded-lg shadow-md">
+            <h2 className="text-lg font-semibold text-dark-muted">Total Members</h2>
+            <p className="text-4xl font-bold text-dark-text">{analyticsData.totalMembers}</p>
           </div>
 
-          {/* Total Projects Card */}
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-lg font-semibold text-gray-600">Total Projects</h2>
-            <p className="text-4xl font-bold text-gray-800">{analyticsData.totalProjects}</p>
+          {/* Total Projects Card - Using Dark Theme Card Styles */}
+          <div className="bg-dark-surface p-6 rounded-lg shadow-md">
+            <h2 className="text-lg font-semibold text-dark-muted">Total Projects</h2>
+            <p className="text-4xl font-bold text-dark-text">{analyticsData.totalProjects}</p>
           </div>
 
-          {/* Average Utilization Card */}
-          <div className={`p-6 rounded-lg shadow-md ${getUtilizationColor(analyticsData.avgUtilization)}`}>
-            <h2 className="text-lg font-semibold">Average Utilization</h2>
-            <p className="text-4xl font-bold">{(analyticsData.avgUtilization * 100).toFixed(0)}%</p>
+          {/* Average Utilization Card - NOW USING STATIC DARK THEME STYLES */}
+          <div className="bg-dark-surface p-6 rounded-lg shadow-md">
+            <h2 className="text-lg font-semibold text-dark-muted">Average Utilization</h2>
+            <p className="text-4xl font-bold text-dark-text">{(analyticsData.avgUtilization * 100).toFixed(0)}%</p>
           </div>
 
-          {/* Skill Gap Alerts Card */}
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-lg font-semibold text-gray-600">Skill Gap Alerts</h2>
-            <p className="text-4xl font-bold text-red-600">{analyticsData.skillGapAlerts}</p>
+          {/* Skill Gap Alerts Card - Using Dark Theme Card Styles */}
+          <div className="bg-dark-surface p-6 rounded-lg shadow-md">
+            <h2 className="text-lg font-semibold text-dark-muted">Skill Gap Alerts</h2>
+            {/* Keeping the red color for the alert count as a visual cue */}
+            <p className="text-4xl font-bold text-red-400">{analyticsData.skillGapAlerts}</p>
           </div>
         </div>
       )}

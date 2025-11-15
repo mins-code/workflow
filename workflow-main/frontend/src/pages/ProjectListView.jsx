@@ -101,9 +101,10 @@ const ProjectListView = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8 font-sans">
+    <div className="min-h-screen bg-page-bg-light p-8 font-sans">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">📂 Project Management</h1>
+        {/* CHANGE: Update text color class to Rich Black (text-rich-black) */}
+        <h1 className="text-dark-bg text-4xl font-bold">📂 Project Management</h1>
         <button
           onClick={() => navigate('/projects/new')}
           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
@@ -113,19 +114,22 @@ const ProjectListView = () => {
       </div>
 
       <div className="grid gap-6">
-        {projects.length === 0 && <p>Loading projects or no data found...</p>}
+        {/* Ensure loading text is dark */}
+        {projects.length === 0 && <p className="text-gray-800">Loading projects or no data found...</p>}
 
         {projects.map((project) => (
           <div
             key={project.id}
-            className="bg-white p-6 rounded-xl shadow-lg border border-gray-200"
+            // CHANGE 2: Set card background to the lighter color (Periwinkle 2)
+            className="bg-card-bg-light p-6 rounded-xl shadow-lg border border-gray-300"
           >
             <h2 className="text-2xl font-bold text-blue-600">{project.title}</h2>
-            <p className="text-gray-500">{project.goal}</p>
-            <p className="text-sm text-gray-400">
+            <p className="text-gray-700">{project.goal}</p>
+            {/* Using a neutral gray for muted text against the light card */}
+            <p className="text-sm text-gray-600">
               Deadline: {new Date(project.deadline).toLocaleDateString()}
             </p>
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-gray-600">
               Assigned Team: {project.team ? project.team.name : 'None'}
             </p>
             <div className="flex space-x-4 mt-4">
@@ -173,7 +177,7 @@ const ProjectListView = () => {
                 onChange={handleTeamChange}
                 className="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500"
               >
-                <option value="">-- Select a Team --</option>
+                <option value="" className="text-black">-- Select a Team --</option>
                 {teams.map((team) => (
                   <option key={team.id} value={team.id}>
                     {team.name}
