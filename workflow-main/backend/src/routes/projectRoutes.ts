@@ -273,5 +273,43 @@ router.post('/tasks/bulk', async (req, res) => {
     res.status(500).json({ error: 'Failed to insert tasks.' });
   }
 });
+/**
+ * PUT /tasks/:taskId/assign: Manually assign a task to a user (Manager only)
+ */
+router.put('/tasks/:taskId/assign', async (req, res) => {
+  const { taskId } = req.params;
+  const { assigneeId } = req.body;
 
+  try {
+    // Check if the logged-in user is a manager
+    const requestingUser = req.user; // From authMiddleware
+    if (!requestingUser || (requestingUser.role !== 'Manager' && requestingUser.role !== 'Senior Dev')) {
+      return res.status(403).json({ 
+        error: 'Forbidden: Only managers can manually assign tasks' 
+      });
+    }
+
+    // Validate that the assignee exists
+    if (assigneeId) {
+      const assignee = await prisma.user.findUnique({
+        where: { id: assigneeId }
+      });
+      if (!assignee) {
+        return res.status(404).json({ error: 'Assignee not found' });
+      }
+    }
+
+    // Update the task with the new assignee
+    const updatedTask = await prisma.task.update({
+      where: { id: taskId },
+      data: { assigneeId: assigneeId || null },
+      include: { assignee: true }
+    });
+
+    res.status(200).json(updatedTask);
+  } catch (error) {
+    console.error(`Error manually assigning task ${taskId}:`, error);
+    res.status(500).json({ error: 'Failed to assign task' });
+  }
+});
 export default router;

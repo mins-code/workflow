@@ -163,7 +163,8 @@ const CreateTeamPage = () => {
             name="role"
             value={newMember.role}
             onChange={handleMemberInputChange}
-            className="text-black border rounded px-2 py-1 w-full"
+            className="border-2 border-gray-400 rounded px-3 py-2 w-full text-gray-900 font-medium bg-white"
+            style={{ color: '#1f2937' }}
             placeholder="Member Role"
             required
           />

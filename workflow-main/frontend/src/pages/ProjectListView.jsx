@@ -173,17 +173,18 @@ const ProjectListView = () => {
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700">Select Team</label>
               <select
-                value={selectedTeamId}
-                onChange={handleTeamChange}
-                className="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="" className="text-black">-- Select a Team --</option>
-                {teams.map((team) => (
-                  <option key={team.id} value={team.id}>
-                    {team.name}
-                  </option>
-                ))}
-              </select>
+    value={selectedTeamId}
+    onChange={handleTeamChange}
+    className="w-full border-2 border-gray-400 rounded-md p-3 focus:ring-blue-500 focus:border-blue-500 text-gray-900 font-medium bg-white"
+    style={{ color: '#1f2937' }}
+>
+    <option value="" className="text-gray-900 font-medium">-- Select a Team --</option>
+    {teams.map((team) => (
+        <option key={team.id} value={team.id} className="text-gray-900 font-medium">
+            {team.name}
+        </option>
+    ))}
+</select>
             </div>
             <div className="flex justify-end">
               <button
