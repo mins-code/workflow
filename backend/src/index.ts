@@ -13,6 +13,7 @@ import authRoutes from './routes/authRoutes';
 import teamRoutes from './routes/teamRoutes'; 
 import memberRoutes from './routes/memberRoutes'; 
 import geminiRoutes from './routes/geminiRoutes'; 
+import analyticsRoutes from './routes/analyticsRoutes'; // Import the analytics routes
 
 const app = express();
 const prisma = new PrismaClient();
@@ -41,6 +42,8 @@ app.use('/api/teams', authMiddleware, teamRoutes); // 🔒 Secured
 app.use('/api/members', authMiddleware, memberRoutes); // 🔒 Secured
 // Connect the Gemini Routes
 app.use('/api/gemini', authMiddleware, geminiRoutes); // 🔒 Secured
+// Add the analytics routes
+app.use('/api/analytics', authMiddleware, analyticsRoutes); // 🔒 Secured by JWT middleware
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

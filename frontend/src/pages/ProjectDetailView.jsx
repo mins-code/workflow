@@ -130,6 +130,11 @@ const ProjectDetailView = () => {
               >
                 {task.assignee?.name || 'Unassigned'}
               </span>
+              {task.assignee && (
+                <p className="text-xs text-gray-500 mt-1">
+                  Capacity: {task.assignee.maxHours} hrs
+                </p>
+              )}
             </div>
           ))}
         </div>
